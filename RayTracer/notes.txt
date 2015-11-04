@@ -1,0 +1,70 @@
+typedef struct Interseccion
+{
+    float lambda;
+    Esfera* e;
+}
+
+Interseccion intersectar(Vect3 O, D, float lambda_min, lambda_max)
+{
+    Interseccion inter;
+    inter.e = NULL;
+    inter.lambda = MAX_INT;
+    foreach e in esferas
+    {
+        (lambra1, lambda2) = inter_esf(O,D,e);
+        if (lambda1 > lambda_min && lambda1 < lambda_max && lambda1 < inter.lambda)
+        {
+            inter.e = e;
+            inter.lambda = lambda1;
+        }
+        if (lambda2 > lambda_min && lambda2 < lambda_max && lambda2 < inter.lambda)
+        {
+            inter.e = e;
+            inter.lambda = lambda2;
+        }
+    }
+    return inter;
+}
+
+int main() 
+{
+    Vec3 O = canvas_pos;
+    for (x= -cw/w; x; cw/2; x++)
+    {
+        x' = x*vw/cw;
+        y' = y*vh/ch;
+        z' = d;
+        Vec D = (x', y', z)
+        Color c = trazar_rayo(O, D, 1, MAX_INT, 4);
+        putpixel(X,Y,c);
+    }
+}
+
+Color trazar_rayo(Vec3 O, D, float lambda_min, lambda_max, int lin_rec)
+{
+        Color res = (0,0,0);
+        Interseccion inter = intersectar(O, D, lambda_min, lambda_max);
+        if (inter.e != NULL)
+        {
+            Vec3 P = 0 + inter.lambda * D;
+            Vec3 N = P - inter.e.centro;
+            Vec3 V = -D;
+
+            res = inter.e.cd*IA;
+            foreach luz in luces
+                Vec3 L = luz.pos - P;
+                res += lambert (P, N, L, V, e);
+                Inter Sombra = intersectar (P, L, epsilon, 1);
+
+                if (sombra.e == NULL)
+                    res += lambert (P, N, L, V, e);
+
+        }
+}
+
+if (lim_rec > 0 && inter.e.coef_refL > 0)
+{
+    RV = 2* N* <N,V> - V
+    Color cr = trazar_rayo(P, RV, epsilon, MAX_INT, lim_rec - 1)
+    res = res* (1 - inter.e.coef_refL) + cr * (inter.e.coef_refL);
+}

@@ -1,7 +1,10 @@
+# mingw
+mingw/
+
 # Object files
 *.o
 *.ko
-*.obj
+#*.obj
 *.elf
 
 # Precompiled Headers
