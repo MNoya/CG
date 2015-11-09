@@ -41,3 +41,4 @@ void DrawObj(Obj* unObj,Vec3f* Vecolor);
 void DrawTriangle(Obj* unObj, Vec3f v1, Vec3f v2, Vec3f v3, Vec3f* color, Vec3i normalcara);
 void printVector(Vec3f v);
 void printVectorIntegers(Vec3i v);
+void FreeObj(Obj* o);

@@ -26,6 +26,7 @@ int main(int argc, char* argv[])
     int up=0;
     int down=0;
     int fill=0;
+    float scale=0;
 
     printf("version: %s\n", glGetString(GL_VERSION));
     glMatrixMode(GL_MODELVIEW);
@@ -34,6 +35,8 @@ int main(int argc, char* argv[])
     glMatrixMode(GL_PROJECTION);
     glViewport(0,0,cw,ch);
     glFrustum(-1,1,-1,1,1,1000);
+
+    int distance = -50;
 
     loadLightning();
     
@@ -45,11 +48,17 @@ int main(int argc, char* argv[])
     veColor->y=color2;
     veColor->z=color3;
 
-    char* fileName = "Models/knight_normales.obj";
-    Obj* model= ParseObj(fileName);
+    printf("Start\n");
+
+    char* fileName = "Models/box_texturas.obj";
+    Obj* model = ParseObj(fileName);
     glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 
     printf("\nDone parsing %s\n",fileName);
+
+    // Texture
+    GLuint tex;
+    glGenTextures(1, &tex);
 
     while (!done)
     {
@@ -59,7 +68,7 @@ int main(int argc, char* argv[])
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        glTranslatef(0.0,0.0,-50.0);
+        glTranslatef(0.0,0.0,distance);
 
         // Rotations
         glRotatef(pitch,1.0,1.0,0.0);
@@ -90,30 +99,48 @@ int main(int argc, char* argv[])
                         right=0;
                         up=0;
                         down=0;
+                        scale=0;
+                    }
+                    if (event.key.keysym.sym ==SDLK_KP_PLUS){
+                        distance = distance + 5;
+                    }
+                    if (event.key.keysym.sym ==SDLK_KP_MINUS){
+                        distance = distance - 5;
+                    }
+                    if (event.key.keysym.sym ==SDLK_LEFT){
+                        left=1;
+                        right=0;
+                        up=0;
+                        down=0;
+                        scale=0;
                     }
                     if (event.key.keysym.sym ==SDLK_RIGHT){
                         left=0;
                         right=1;
                         up=0;
                         down=0;
+                        scale=0;
                     }
                     if (event.key.keysym.sym ==SDLK_UP){
                         left=0;
                         right=0;
                         up=1;
                         down=0;
+                        scale=0;
                     }
                     if (event.key.keysym.sym ==SDLK_DOWN){
                         left=0;
                         right=0;
                         up=0;
                         down=1;
+                        scale=0;
                     }
                     if (event.key.keysym.sym ==SDLK_SPACE){
                         left=0;
                         right=0;
                         up=0;
                         down=0;
+                        scale=0;
                         fill=abs(fill-1);
                     }
                     if (event.key.keysym.sym != SDLK_ESCAPE){
@@ -129,6 +156,7 @@ int main(int argc, char* argv[])
                         right=0;
                         up=0;
                         down=0;
+                        scale=0;
                         break;
                     }
             }
@@ -137,13 +165,16 @@ int main(int argc, char* argv[])
     }
 
     cg_free(veColor);
+    FreeObj(model);
     cg_close(); 
+
     // Ejemplo del modulo de Manejo de Memoria (MM):
-   /* int* pint = (int *)cg_malloc(10*sizeof(int));
+    int* pint = (int *)cg_malloc(10*sizeof(int));
     printf("pint is a pointer: %p\n", pint);
 
     cg_free(pint); // olvidarse de liberar este objeto produce un mensaje
-	*/
+
+    cg_memcheck();
 
     return 0;
 }
