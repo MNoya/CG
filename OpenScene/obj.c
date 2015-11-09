@@ -61,10 +61,6 @@ Obj* ParseObj(char* path){
     o->nNormales = 0;
 
     FILE *file = fopen ( path, "r" );
-    if( file == NULL ){
-        printf("Impossible to open the file !\n");
-        return false;
-    }
     if (file)
     {
         char line [ 128 ];
