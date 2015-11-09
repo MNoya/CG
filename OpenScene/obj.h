@@ -33,12 +33,13 @@ typedef struct {
     int nNormales;
 } Obj;
 
+Obj* obj_load(char* path);
+void obj_render(Obj* unObj);
+void obj_free(Obj* o);
+
 Vec3i* CountLines(char* path);
-Obj* ParseObj(char* path);
 int GetVertice(char* verticeANormal);
 int GetNormal(char* verticeANormal);
-void DrawObj(Obj* unObj,Vec3f* Vecolor);
-void DrawTriangle(Obj* unObj, Vec3f v1, Vec3f v2, Vec3f v3, Vec3f* color, Vec3i normalcara);
+void DrawTriangle(Obj* unObj, Vec3f v1, Vec3f v2, Vec3f v3, Vec3i normalcara);
 void printVector(Vec3f v);
 void printVectorIntegers(Vec3i v);
-void FreeObj(Obj* o);

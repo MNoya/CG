@@ -8,7 +8,7 @@ LIB_DIRS=-L..\mingw\lib
 
 # agregue aqui, separado con espacios, cada archivo .c que produzca.
 # renombre la extension .c a .o (ejemplo.c -> ejemplo.o):
-OBJECTS = framework\color.o framework\mm.o framework\canvas.o glew.o main.o list.o obj.o shader.o
+OBJECTS = framework\color.o framework\mm.o framework\canvas.o glew.o main.o obj.o shader.o lights.o
 
 # nombre a asignar al ejecutable producido:
 EXE = cg.exe
