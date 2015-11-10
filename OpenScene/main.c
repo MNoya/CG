@@ -14,9 +14,8 @@
 
 int main(int argc, char* argv[])
 {
-    // Crear una ventana de 500x500 pixels:
-	int cw = 900;
-	int ch = 900;
+	int cw = 600;
+	int ch = 600;
 
 	cg_init(cw, ch, NULL);
 
@@ -65,8 +64,14 @@ int main(int argc, char* argv[])
     float ang = 0.0f;
     float pitch = 0.0f;
     float ang_vel = 1.0f;
+    int distance = -3;
 
-    Obj* box = obj_load("Models/knight_texturas.obj");
+    char* modelName = "Models/box_texturas.obj";
+    char* textureName = "Models/box.jpg";
+    Obj* model = obj_load(modelName);
+    printf("\nDone parsing %s",modelName);
+    printf("\nCaras: %d\nVertices: %d\nNormales: %d\nTexturas: %d",model->nCaras,model->nVertices,model->nNormales,model->nTexturas);
+
 	char done = 0;
 	char wireframe = 0;
 	char bfc = 0;
@@ -75,14 +80,17 @@ int main(int argc, char* argv[])
     unsigned char key_pressed[1024];
     memset(key_pressed, 0, 1024);
 
+    printf("\nLoading shaders");
     char use_shader = 0;
     char specular = 0;
     Shader gouraud = shader_new("shaders/gouraud_vp.glsl", "shaders/gouraud_fp.glsl");
+    
     GLint uniform_especular = shader_get_unif_loc(gouraud, "especular");
     GLint uniform_tex = shader_get_unif_loc(gouraud, "tex");
 
     //Cargo la imagen de disco usando SDL_image
-    SDL_Surface* surface = IMG_Load("Models/knight_good.png");
+    printf("\nLoading texture %s ",textureName);
+    SDL_Surface* surface = IMG_Load(textureName);
     if (surface==NULL) { //Si falla la carga de la imagen, despliego el mensaje de error correspondiente y termino el programa.
         printf("Error: \"%s\"\n",SDL_GetError());
         return 1;
@@ -125,6 +133,8 @@ int main(int argc, char* argv[])
     glTexParameteri(GL_TEXTURE_2D,
                     GL_TEXTURE_WRAP_T,
                     GL_REPEAT);
+
+    printf("Done, drawing...");
 
 	while (!done)
 	{
@@ -187,7 +197,7 @@ int main(int argc, char* argv[])
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        glTranslatef(0.0f, 0.0f, -50.0f);
+        glTranslatef(0.0,0.0,distance);
         glRotatef(pitch, 1.0f, 0.0f, 0.0f);
         glRotatef(ang, 0.0f, 1.0f, 0.0f);
 
@@ -212,28 +222,25 @@ int main(int argc, char* argv[])
             glUniform1i(uniform_tex, 0);
             //Luego asocio la textura con el id "texture"
             glBindTexture(GL_TEXTURE_2D,texture);
-            obj_render(box);
-            shader_stop(gouraud);
+            obj_render(model);
+            //shader_stop(gouraud);
         }
         else
         {
             glBindTexture(GL_TEXTURE_2D,texture);
-            obj_render(box);
+            glBegin(GL_TRIANGLES);
+                obj_render(model);
+            glEnd();
         }
 
         cg_repaint();
 	}
-    obj_free(box);
-    shader_free(gouraud);
+    obj_free(model);
+    //shader_free(gouraud);
     glDeleteTextures(1,&texture);
-	// Liberar recursos:
+	
+    // Liberar recursos:
 	cg_close();
-
-	// Ejemplo del modulo de Manejo de Memoria (MM):
-	int* pint = (int *)cg_malloc(10*sizeof(int));
-	printf("pint is a pointer: %p\n", pint);
-	cg_free(pint); // olvidarse de liberar este objeto produce un mensaje
-
 
 	return 0;
 }

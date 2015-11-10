@@ -6,21 +6,27 @@
 Obj* obj_load(char* path)
 {
     const char space[2] = " ";
-    Vec3i* contVec = CountLines(path);
-    int vecX = contVec->x;//cant vertices
-    int vecY = contVec->y;//cant caras
-    int vecZ = contVec->z;//cant normales
+    ObjData* contVec = CountLines(path);
+    int nVertices = contVec->nVertices;
+    int nCaras = contVec->nCaras;
+    int nNormales = contVec->nNormales;
+    int nTexturas = contVec->nTexturas;
+
     cg_free(contVec); //Necessary?
 
-    Vec3f* listaVertices = (Vec3f*) cg_malloc(sizeof(Vec3f) * vecX);
-    Vec3i* listaCaras = (Vec3i*) cg_malloc(sizeof(Vec3i) * vecY);
-    Vec3f* listaNormales = (Vec3f*) cg_malloc(sizeof(Vec3f) * vecZ);
-    Vec3i* listaNormalCara = (Vec3i*) cg_malloc(sizeof(Vec3i)*vecY);
+    Vec3f* listaVertices = (Vec3f*) cg_malloc(sizeof(Vec3f) * nVertices);
+    
+    Vec3i* listaCaras = (Vec3i*) cg_malloc(sizeof(Vec3i) * nCaras);
+    Vec3i* listaNormalCara = (Vec3i*) cg_malloc(sizeof(Vec3i) * nCaras);
+    Vec3i* listaTexturaCara = (Vec3i*) cg_malloc(sizeof(Vec3i)* nCaras);    
+    Vec3f* listaNormales = (Vec3f*) cg_malloc(sizeof(Vec3f) * nNormales);
+    Vec2f* listaTexturas = (Vec2f*) cg_malloc(sizeof(Vec2f)* nTexturas);
 
-    Obj* o = cg_malloc(sizeof(Obj));
+    Obj* o = (Obj*) cg_malloc(sizeof(Obj));
     o->nVertices = 0;
     o->nCaras = 0;
     o->nNormales = 0;
+    o->nTexturas = 0;
 
     FILE *file = fopen ( path, "r" );
     if (file)
@@ -32,10 +38,9 @@ Obj* obj_load(char* path)
             if( strcmp(line,"")!=0 )
             {
                 char *token = strtok(line, space);
-                //printf("Analizando token: %s ",token);
+                //printf("\nAnalizando token: %s ",token);
                 if (strcmp(token,"v")==0)
                 {
-                    o->nVertices++;
                     token = strtok(NULL, space);
                     float Vertex[3];
                     int i = 0;
@@ -48,60 +53,60 @@ Obj* obj_load(char* path)
                   
                     Vec3f v = {Vertex[0],Vertex[1],Vertex[2]};
                     listaVertices[o->nVertices] = v;
-                    //printf("Vertice %d\n: ",o->nVertices);
+                    //printf("\nVertice %d: ",o->nVertices);
                     //printVector(v); 
+                    o->nVertices++;
                 }
 
                 else if (strcmp(token,"f")==0)
                 {   
-                    o->nCaras++;
                     //printf("\nLinea de Cara %d: %s\n",o->nCaras,token);
 
                     token = strtok(NULL, space);
 
                     int j = 0;
-                    char* stringsVerticeNormal[3];
+                    char* stringFace[3];
 
                     while( token != NULL ) 
                     {
-                        stringsVerticeNormal[j] = token;
+                        stringFace[j] = token;
                         j++;
                         token = strtok(NULL, space);
                     }
 
-                    //printf("%s %s %s",stringsVerticeNormal[0],stringsVerticeNormal[1],stringsVerticeNormal[2]);
+                    int vertice1 = GetVertice(stringFace[0]);
+                    int normal1 = GetNormal(stringFace[0]);
+                    int text1 = GetTexture(stringFace[0]);
 
-                    int vertice1 = GetVertice(stringsVerticeNormal[0]);
-                    int normal1 = GetNormal(stringsVerticeNormal[0]);
-                    //int tex1 = GetTexture(stringsVerticeNormal[0]);
+                    int vertice2 = GetVertice(stringFace[1]);
+                    int normal2 = GetNormal(stringFace[1]);
+                    int text2 = GetTexture(stringFace[1]);
 
-                    int vertice2 = GetVertice(stringsVerticeNormal[1]);
-                    int normal2 = GetNormal(stringsVerticeNormal[1]);
-                    //int tex2 = GetTexture(stringsVerticeNormal[1]);
-
-                    int vertice3 = GetVertice(stringsVerticeNormal[2]);
-                    int normal3 = GetNormal(stringsVerticeNormal[2]);
-                    //int tex3 = GetTexture(stringsVerticeNormal[2]);
-
-                    //printf("\nVertices: %i %i %i",vertice1,vertice2,vertice3);
-                    //printf("\nNormales: %i %i %i",normal1,normal2,normal3);
+                    int vertice3 = GetVertice(stringFace[2]);
+                    int normal3 = GetNormal(stringFace[2]);
+                    int text3 = GetTexture(stringFace[2]);
 
                     Vec3i f = {vertice1,vertice2,vertice3};
                     Vec3i n = {normal1,normal2,normal3};
+                    Vec3i t = {text1,text2,text3};
                     
                     /*
                     printf("Vertices de %d: ",o->nCaras);
                     printVectorIntegers(f);
                     printf("Normales de %d: ",o->nCaras);
                     printVectorIntegers(n);
+                    printf("Texturas de %d: ",o->nCaras);
+                    printVectorIntegers(t);
                     */
                     
                     listaCaras[o->nCaras] = f;
                     listaNormalCara[o->nCaras]=n;
+                    listaTexturaCara[o->nCaras]=t;
+
+                    o->nCaras++;
                 }
                 else if (strcmp(token,"vn")==0)
                 {
-                    o->nNormales++;
                     float normal[3];
                     token = strtok(NULL, space);
                     int k = 0;
@@ -112,7 +117,24 @@ Obj* obj_load(char* path)
                         token = strtok(NULL, space);
                     }
                     Vec3f vn = {normal[0],normal[1],normal[2]};
-                    listaNormales[o->nNormales] = vn;   
+                    listaNormales[o->nNormales] = vn;  
+                    o->nNormales++; 
+                }
+                else if (strcmp(token,"vt")==0)
+                {
+                    float textura[2];
+                    token = strtok(NULL, space);
+                    int k = 0;
+                    while( token != NULL ) 
+                    {
+                        textura[k] = atof(token);
+                        k++;
+                        token = strtok(NULL, space);
+                    }
+
+                    Vec2f vt = {textura[0],textura[1]};
+                    listaTexturas[o->nTexturas] = vt;  
+                    o->nTexturas++; 
                 }
             }
         }
@@ -122,29 +144,29 @@ Obj* obj_load(char* path)
     o->listaCaras = listaCaras;
     o->listaNormales = listaNormales;
     o->listaNormalCara = listaNormalCara;
+    o->listaTexturas = listaTexturas;
+    o->listaTexturaCara = listaTexturaCara;
 
     return o;
 }
 
-void obj_render(Obj* unObj)
+void obj_render(Obj* o)
 {
-    int nCaras = unObj->nCaras;
+    int nCaras = o->nCaras;
     //printf("Drawing OBJ of %d faces\n", nCaras);
 
-    for (int i = 1; i < nCaras; ++i)
+    for (int i = 0; i < nCaras; ++i)
     {
-        int vx = unObj->listaCaras[i].x;
-        int vy = unObj->listaCaras[i].y;
-        int vz = unObj->listaCaras[i].z;
-    
-        //printf("Face %d: %d %d %d\n", i, vx, vy, vz);   
-        //printf("DrawTriangle between %d  %d  %d\n",unObj->listaVertices[vy],unObj->listaVertices[vx], unObj->listaVertices[vz]); 
+        int vx = o->listaCaras[i].x;
+        int vy = o->listaCaras[i].y;
+        int vz = o->listaCaras[i].z;
 
-        DrawTriangle(unObj,
-            unObj->listaVertices[vx],
-            unObj->listaVertices[vy],
-            unObj->listaVertices[vz],
-            unObj->listaNormalCara[i]);
+        DrawTriangle(o,
+            o->listaVertices[vx],
+            o->listaVertices[vy],
+            o->listaVertices[vz],
+            o->listaNormalCara[i],
+            o->listaTexturaCara[i]);
     }
 }
 
@@ -154,31 +176,6 @@ void obj_free(Obj* o)
     int nVertices = o->nVertices;
     int nCaras = o->nCaras;
     int nNormales = o->nNormales;
-
-    // Free vertex array
-    /*printf("Freeing %d elements from listaVertices\n",nVertices);
-    for (int i = 1; i <= nVertices; ++i)
-    {
-        printf("Freeing listaVertices[%d]\n", i);
-        cg_free(&o->listaVertices);
-    }
-    
-    // Free face array
-    printf("Freeing %d elements from listaCaras\n",nCaras);
-    for (int i = 1; i <= nCaras; ++i)
-    {
-        printf("Freeing listaCaras[%d] and listaNormalCara[%d]\n", i,i);
-        cg_free(&o->listaCaras[i]);
-        cg_free(&o->listaNormalCara[i]);
-    }
-
-    // Free normal array
-    printf("Freeing %d elements from listaNormales\n",nNormales);
-    for (int i = 1; i < nNormales; ++i)
-    {
-        printf("Freeing listaNormales[%d]\n", i);
-        cg_free(&o->listaNormales[i]);
-    }*/
 
     // Free struct
     printf("Free listaVertices: %p\n",o->listaVertices);
@@ -191,7 +188,13 @@ void obj_free(Obj* o)
     cg_free(o->listaNormales);
 
     printf("Free listaNormalCara: %p\n",o->listaNormalCara);
-    cg_free(o->listaNormalCara);  
+    cg_free(o->listaNormalCara); 
+
+    printf("Free listaTexturaCara: %p\n",o->listaTexturaCara);
+    cg_free(o->listaTexturaCara);
+
+    printf("Free listaTexturas: %p\n",o->listaTexturas);
+    cg_free(o->listaTexturas); 
 
     printf("Free obj: %p\n",o);
     cg_free(o);
@@ -199,16 +202,17 @@ void obj_free(Obj* o)
 
 //-----------------------------------
 
-Vec3i* CountLines(char* path)
+ObjData* CountLines(char* path)
 {
 	FILE *file = fopen ( path, "r" );
-	Vec3i* result = cg_malloc(sizeof(Vec3i));
+	ObjData* result = (ObjData*) cg_malloc(sizeof(ObjData));
     const char space[2] = " ";
     if (file)
     {
     	int vectores=0;
     	int caras=0;
         int normales=0;
+        int texturas=0;
         char line [ 128 ];
         while ( fgets ( line, sizeof line, file ) != NULL ) 
         {
@@ -228,73 +232,87 @@ Vec3i* CountLines(char* path)
                 {
                     normales++;
                 }
+                else if (strcmp(token,"vt")==0)
+                {
+                    texturas++;
+                }
             }
         }
-        result->x=vectores;
-        result->y=caras;
-        result->z=normales;
+        result->nVertices=vectores;
+        result->nCaras=caras;
+        result->nNormales=normales;
+        result->nTexturas=texturas;
         fclose(file);
+
+        //printf("%d %d %d %d",vectores,caras,normales,texturas);
     }
   	return result;
 }
 
-int GetVertice(char* s)
+int GetVertice(char* str)
 {
     char *token1 = cg_malloc(sizeof(char) * 254);
-    token1 = strcpy(token1, s);
+    token1 = strcpy(token1, str);
     token1 = strtok(token1, "/");
-    int res = atoi(token1);
+    int res = atoi(token1)-1;
     cg_free(token1);
 
-    //printf("\nGetVertice %s, returns: %d",s,res);
+    //printf("\nGetVertice %s, returns: %d",str,res);
     return res;
 }
 
-int GetNormal(char* s)
+int GetNormal(char* str)
 {
     char *token2 = cg_malloc(sizeof(char) * 254);
-    token2 = strcpy(token2, s);
+    token2 = strcpy(token2, str);
     token2 = strtok(token2, "/");
     token2 = strtok(NULL, "/");
-    int res = atoi(token2);
+    int res = atoi(token2)-1;
     cg_free(token2);
 
-    //printf("\nGetNormal %s, returns: %d",s,res);
+    //printf("\nGetNormal %s, returns: %d",str,res);
     return res;
 }
 
-int GetTexture(char* s)
+int GetTexture(char* str)
 {
     char *token3 = cg_malloc(sizeof(char) * 254);
-    token3 = strcpy(token3, s);
+    token3 = strcpy(token3, str);
     token3 = strtok(token3, "/");
     token3 = strtok(NULL, "/");
-    token3 = strtok(NULL, "/");
-    int res = atoi(token3);
+    int res = atoi(token3)-1;
     cg_free(token3);
 
-    printf("\nGetTexture %s Returns: %d",s,res);
+    //printf("\nGetTexture %s, returns: %d",str,res);
     return res;
 }
 
-void DrawTriangle(Obj* o, Vec3f v1, Vec3f v2, Vec3f v3, Vec3i normalcara)
-{       
+void DrawTriangle(Obj* o, Vec3f v1, Vec3f v2, Vec3f v3, Vec3i normalcara, Vec3i texturacara)
+{   
+
+    /*printf("DrawTriangle between (%2f,%2f,%2f) (%2f,%2f,%2f) (%2f,%2f,%2f)\n",
+        v1.x, v1.y, v1.z,
+        v2.x, v2.y, v2.z,
+        v3.x, v3.y, v3.z);*/
+
     //glColor3f(color->x,color->y,color->z);
-    glNormal3f(o->listaNormales[normalcara.x].x, o->listaNormales[normalcara.x].y, o->listaNormales[normalcara.x].z);
+    glTexCoord2f(o->listaTexturas[texturacara.x].x, o->listaTexturas[texturacara.x].y);
     glVertex3f(v1.x, v1.y, v1.z);
     
     //glColor3f(color->x,color->y,color->z);
     glNormal3f(o->listaNormales[normalcara.y].x, o->listaNormales[normalcara.y].y, o->listaNormales[normalcara.y].z);
+    glTexCoord2f(o->listaTexturas[texturacara.y].x, o->listaTexturas[texturacara.y].y);
     glVertex3f(v2.x, v2.y, v2.z);
 
     //glColor3f(color->x,color->y,color->z);
     glNormal3f(o->listaNormales[normalcara.z].x, o->listaNormales[normalcara.z].y, o->listaNormales[normalcara.z].z);
+    glTexCoord2f(o->listaTexturas[texturacara.z].x, o->listaTexturas[texturacara.z].y);
     glVertex3f(v3.x, v3.y, v3.z);
 }
 
 void printVector(Vec3f v)
 {
-    printf("(%2f,%2f,%2f)\n",v.x,v.y,v.z);
+    printf("(%2f,%2f,%2f)",v.x,v.y,v.z);
 }
 
 void printVectorIntegers(Vec3i v)
