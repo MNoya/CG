@@ -8,6 +8,7 @@
 #endif
 
 #include "obj.h"
+#include "lights.h"
 #include "shader.h"
 
 #include <SDL/SDL_image.h>
@@ -38,36 +39,19 @@ int main(int argc, char* argv[])
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-
     glMatrixMode(GL_PROJECTION);
     glViewport(0,0,cw, ch);
     glFrustum(-1,1,-1,1,1,1000);
 
-    glEnable(GL_LIGHTING);
-
-    //glEnable(GL_NORMALIZE);
-    float l0[] = {1.0f,1.0f,1.0f,1.0f};
-    float la[] = {0.10f,0.10f,0.10f,1.0f};
-    float l0p[]= {1.0f,1.0f,1.0f,1.0f};
-    float ls[] = {1.0f,1.0f,1.0f,1.0f};
-    glLightfv(GL_LIGHT0, GL_AMBIENT, la);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, l0);
-    glLightfv(GL_LIGHT0, GL_POSITION, l0p);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, ls);
-    glEnable(GL_LIGHT0);
-
-    float cyan[] = {1.0f, 1.0f, 1.0f, 1.f};
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, cyan);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, ls);
-    glMateriali(GL_FRONT, GL_SHININESS, 16);
+    loadLightning();
 
     float ang = 0.0f;
     float pitch = 0.0f;
-    float ang_vel = 1.0f;
-    int distance = -3;
+    float ang_vel = 0.1f;
+    int distance = -50;
 
-    char* modelName = "Models/box_texturas.obj";
-    char* textureName = "Models/box.jpg";
+    char* modelName = "Models/knight_texturas.obj";
+    char* textureName = "Models/knight_good.png";
     Obj* model = obj_load(modelName);
     printf("\nDone parsing %s",modelName);
     printf("\nCaras: %d\nVertices: %d\nNormales: %d\nTexturas: %d",model->nCaras,model->nVertices,model->nNormales,model->nTexturas);
@@ -223,7 +207,7 @@ int main(int argc, char* argv[])
             //Luego asocio la textura con el id "texture"
             glBindTexture(GL_TEXTURE_2D,texture);
             obj_render(model);
-            //shader_stop(gouraud);
+            shader_stop(gouraud);
         }
         else
         {

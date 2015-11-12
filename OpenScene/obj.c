@@ -67,6 +67,13 @@ Obj* obj_load(char* path)
                     int j = 0;
                     char* stringFace[3];
 
+                    /*char ch;
+                    int vertexIndex[3], uvIndex[3], normalIndex[3];
+                    int matches = fscanf(file, "%c %d/%d/%d %d/%d/%d %d/%d/%d\n", &ch, &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
+                    if (matches != 10){
+                        printf("File can't be read by our simple parser, got only %d matches\n",matches);
+                    }*/
+
                     while( token != NULL ) 
                     {
                         stringFace[j] = token;
@@ -85,6 +92,8 @@ Obj* obj_load(char* path)
                     int vertice3 = GetVertice(stringFace[2]);
                     int normal3 = GetNormal(stringFace[2]);
                     int text3 = GetTexture(stringFace[2]);
+
+
 
                     Vec3i f = {vertice1,vertice2,vertice3};
                     Vec3i n = {normal1,normal2,normal3};
@@ -280,6 +289,7 @@ int GetTexture(char* str)
     token3 = strcpy(token3, str);
     token3 = strtok(token3, "/");
     token3 = strtok(NULL, "/");
+    token3 = strtok(NULL, "/");
     int res = atoi(token3)-1;
     cg_free(token3);
 
@@ -296,6 +306,7 @@ void DrawTriangle(Obj* o, Vec3f v1, Vec3f v2, Vec3f v3, Vec3i normalcara, Vec3i 
         v3.x, v3.y, v3.z);*/
 
     //glColor3f(color->x,color->y,color->z);
+    glNormal3f(o->listaNormales[normalcara.x].x, o->listaNormales[normalcara.x].y, o->listaNormales[normalcara.x].z);
     glTexCoord2f(o->listaTexturas[texturacara.x].x, o->listaTexturas[texturacara.x].y);
     glVertex3f(v1.x, v1.y, v1.z);
     
