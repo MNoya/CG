@@ -29,126 +29,70 @@ Obj* obj_load(char* path)
     o->nTexturas = 0;
 
     FILE *file = fopen ( path, "r" );
-    if (file)
+    if( file == NULL ){
+        printf("File %s error!\n",path);
+        return 0;
+    }
+
+    int res;
+    do
     {
         char line [ 128 ];
-        while (fgets ( line, sizeof line, file ) != NULL ) /* read a line */
+        res = fscanf(file, "%s", line);
+
+        if (strcmp(line,"v")==0)
         {
-            //printf("\nParseando linea %s", line);
-            if( strcmp(line,"")!=0 )
-            {
-                char *token = strtok(line, space);
-                //printf("\nAnalizando token: %s ",token);
-                if (strcmp(token,"v")==0)
-                {
-                    token = strtok(NULL, space);
-                    float Vertex[3];
-                    int i = 0;
-                    while( token != NULL ) 
-                    {
-                        Vertex[i] = atof(token);
-                        i++;
-                        token = strtok(NULL, space);
-                    }
-                  
-                    Vec3f v = {Vertex[0],Vertex[1],Vertex[2]};
-                    listaVertices[o->nVertices] = v;
-                    //printf("\nVertice %d: ",o->nVertices);
-                    //printVector(v); 
-                    o->nVertices++;
-                }
-
-                else if (strcmp(token,"f")==0)
-                {   
-                    //printf("\nLinea de Cara %d: %s\n",o->nCaras,token);
-
-                    token = strtok(NULL, space);
-
-                    int j = 0;
-                    char* stringFace[3];
-
-                    /*char ch;
-                    int vertexIndex[3], uvIndex[3], normalIndex[3];
-                    int matches = fscanf(file, "%c %d/%d/%d %d/%d/%d %d/%d/%d\n", &ch, &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
-                    if (matches != 10){
-                        printf("File can't be read by our simple parser, got only %d matches\n",matches);
-                    }*/
-
-                    while( token != NULL ) 
-                    {
-                        stringFace[j] = token;
-                        j++;
-                        token = strtok(NULL, space);
-                    }
-
-                    int vertice1 = GetVertice(stringFace[0]);
-                    int normal1 = GetNormal(stringFace[0]);
-                    int text1 = GetTexture(stringFace[0]);
-
-                    int vertice2 = GetVertice(stringFace[1]);
-                    int normal2 = GetNormal(stringFace[1]);
-                    int text2 = GetTexture(stringFace[1]);
-
-                    int vertice3 = GetVertice(stringFace[2]);
-                    int normal3 = GetNormal(stringFace[2]);
-                    int text3 = GetTexture(stringFace[2]);
-
-
-
-                    Vec3i f = {vertice1,vertice2,vertice3};
-                    Vec3i n = {normal1,normal2,normal3};
-                    Vec3i t = {text1,text2,text3};
-                    
-                    /*
-                    printf("Vertices de %d: ",o->nCaras);
-                    printVectorIntegers(f);
-                    printf("Normales de %d: ",o->nCaras);
-                    printVectorIntegers(n);
-                    printf("Texturas de %d: ",o->nCaras);
-                    printVectorIntegers(t);
-                    */
-                    
-                    listaCaras[o->nCaras] = f;
-                    listaNormalCara[o->nCaras]=n;
-                    listaTexturaCara[o->nCaras]=t;
-
-                    o->nCaras++;
-                }
-                else if (strcmp(token,"vn")==0)
-                {
-                    float normal[3];
-                    token = strtok(NULL, space);
-                    int k = 0;
-                    while( token != NULL ) 
-                    {
-                        normal[k] = atof(token);
-                        k++;
-                        token = strtok(NULL, space);
-                    }
-                    Vec3f vn = {normal[0],normal[1],normal[2]};
-                    listaNormales[o->nNormales] = vn;  
-                    o->nNormales++; 
-                }
-                else if (strcmp(token,"vt")==0)
-                {
-                    float textura[2];
-                    token = strtok(NULL, space);
-                    int k = 0;
-                    while( token != NULL ) 
-                    {
-                        textura[k] = atof(token);
-                        k++;
-                        token = strtok(NULL, space);
-                    }
-
-                    Vec2f vt = {textura[0],textura[1]};
-                    listaTexturas[o->nTexturas] = vt;  
-                    o->nTexturas++; 
-                }
-            }
+            Vec3f vertex;
+            fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z );
+          
+            listaVertices[o->nVertices] = vertex;
+            printf("\nVertice %d: ",o->nVertices);
+            printVector(vertex); 
+            o->nVertices++;
         }
-        fclose(file);
-    }
+
+        else if (strcmp(line,"f")==0)
+        {   
+            char c;
+            int vertice1, vertice2, vertice3;
+            int normal1, normal2, normal3;
+            int text1, text2, text3;
+
+            int matches = fscanf(file, "%c %d/%d/%d %d/%d/%d %d/%d/%d\n", &c, &vertice1, &normal1, &text1, &vertice2, &normal2, &text2, &vertice3, &normal3, &text3);
+            
+            //printf("%d/%d/%d %d/%d/%d %d/%d/%d\n", vertice1, normal1, text1, vertice2, normal2, text2, vertice3, normal3, text3);
+
+            Vec3i f = {vertice1-1,vertice2-1,vertice3-1};
+            Vec3i n = {normal1-1,normal2-1,normal3-1};
+            Vec3i t = {text1-1,text2-1,text3-1};
+            
+            listaCaras[o->nCaras] = f;
+            listaNormalCara[o->nCaras]=n;
+            listaTexturaCara[o->nCaras]=t;
+
+            o->nCaras++;
+        }
+        else if (strcmp(line,"vn")==0)
+        {
+            Vec3f normal;
+            fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z ); 
+            printf("\nNormal %d: ",o->nNormales);
+            printVector(normal); 
+            listaNormales[o->nNormales] = normal;  
+            o->nNormales++; 
+        }
+        else if (strcmp(line,"vt")==0)
+        {
+            Vec2f vt;
+            fscanf(file, "%f %f\n", &vt.x, &vt.y );  
+
+            listaTexturas[o->nTexturas] = vt;  
+            o->nTexturas++; 
+        }
+    } while (res != EOF);
+
+    fclose(file);
+
     o->listaVertices = listaVertices;
     o->listaCaras = listaCaras;
     o->listaNormales = listaNormales;
@@ -256,45 +200,6 @@ ObjData* CountLines(char* path)
         //printf("%d %d %d %d",vectores,caras,normales,texturas);
     }
   	return result;
-}
-
-int GetVertice(char* str)
-{
-    char *token1 = cg_malloc(sizeof(char) * 254);
-    token1 = strcpy(token1, str);
-    token1 = strtok(token1, "/");
-    int res = atoi(token1)-1;
-    cg_free(token1);
-
-    //printf("\nGetVertice %s, returns: %d",str,res);
-    return res;
-}
-
-int GetNormal(char* str)
-{
-    char *token2 = cg_malloc(sizeof(char) * 254);
-    token2 = strcpy(token2, str);
-    token2 = strtok(token2, "/");
-    token2 = strtok(NULL, "/");
-    int res = atoi(token2)-1;
-    cg_free(token2);
-
-    //printf("\nGetNormal %s, returns: %d",str,res);
-    return res;
-}
-
-int GetTexture(char* str)
-{
-    char *token3 = cg_malloc(sizeof(char) * 254);
-    token3 = strcpy(token3, str);
-    token3 = strtok(token3, "/");
-    token3 = strtok(NULL, "/");
-    token3 = strtok(NULL, "/");
-    int res = atoi(token3)-1;
-    cg_free(token3);
-
-    //printf("\nGetTexture %s, returns: %d",str,res);
-    return res;
 }
 
 void DrawTriangle(Obj* o, Vec3f v1, Vec3f v2, Vec3f v3, Vec3i normalcara, Vec3i texturacara)
