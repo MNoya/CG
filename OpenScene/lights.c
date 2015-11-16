@@ -37,10 +37,4 @@ void loadLightning()
     glMaterialfv(GL_FRONT, GL_SPECULAR, ls);
     //Cargo el coeficiente especular de la cara de adelante del objeto a dibujar.
     glMateriali(GL_FRONT, GL_SHININESS, 32);
-
-    glEnable(GL_DEPTH_TEST);
-
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glFrontFace(GL_CW);
 }
