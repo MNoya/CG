@@ -16,6 +16,18 @@
 
 GLuint texture_load(char* path);
 void enableCullFace();
+void setCurrentObject(int i);
+
+// Scene values
+float pitch = 0.0f;
+float yaw = 0.0f;
+float roll = 0.0f;
+float scale = 0.0f;
+float ang_vel = 0.1f;
+float posX = 0;
+float posY = 0;
+float posZ = 0;
+int currentObject = 1;
 
 int main(int argc, char* argv[])
 {
@@ -49,16 +61,13 @@ int main(int argc, char* argv[])
     glViewport(0,0, cw, ch);
     glFrustum(-1,1,-1,1,1,1000);
 
-    // Scene values
-    float ang = 0.0f;
-    float pitch = 0.0f;
-    float ang_vel = 0.1f;
-    int distance = -50;
     char done = 0;
     char wireframe = 0;
     char bfc = 0;
     char zbuff = 1;
     glEnable(GL_DEPTH_TEST); // Z-Buffer
+    char use_shader = 0;
+    char specular = 0;
     char light = 1;
     loadLightning();
 
@@ -67,15 +76,15 @@ int main(int argc, char* argv[])
     
     printf("Loading models\n");
     Obj* knight_good = obj_load("Models/knight_texturas.obj");
-    Obj* knight_bad = obj_load("Models/box_texturas.obj");
+    Obj* knight_bad = obj_load("Models/knight_texturas.obj");
+    Obj* box = obj_load("Models/box_texturas.obj");
 
     printf("\nLoading textures\n");
     GLuint texture_good = texture_load("Models/knight_good.png");
-    GLuint texture_bad = texture_load("Models/box.jpg");
+    GLuint texture_bad = texture_load("Models/knight.png");
+    GLuint texture_box = texture_load("Models/box.jpg");
 
     printf("Loading shaders\n");
-    char use_shader = 0;
-    char specular = 0;
     Shader gouraud = shader_new("shaders/gouraud_vp.glsl", "shaders/gouraud_fp.glsl");
     
     GLint uniform_especular = shader_get_unif_loc(gouraud, "especular");
@@ -85,12 +94,13 @@ int main(int argc, char* argv[])
 
     while (!done)
     {
-         Process Keypresses
+        /* Process Keypresses
             p: shader
-            s: specular
-            z: z-buffer
+            L: specular
+            n: z-buffer
             m: wireframe
-        
+            b: b-culling
+        */
         SDL_Event event;
         while(SDL_PollEvent(&event))
         {
@@ -99,10 +109,12 @@ int main(int argc, char* argv[])
                 case SDL_KEYDOWN:
                     key_pressed[event.key.keysym.sym] = 1;
                     if (event.key.keysym.sym == SDLK_p) { use_shader = !use_shader; break; }
-                    else if (event.key.keysym.sym == SDLK_s) { specular = !specular; break; }
+                    else if (event.key.keysym.sym == SDLK_l) { specular = !specular; break; }
                     else if (event.key.keysym.sym == SDLK_z) { zbuff = !zbuff; zbuff ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST); break; }
                     else if (event.key.keysym.sym == SDLK_m) { wireframe = !wireframe; wireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break; }
                     else if (event.key.keysym.sym == SDLK_b) { bfc = !bfc; bfc ? enableCullFace() : glDisable(GL_CULL_FACE); break; }
+                    else if (event.key.keysym.sym == SDLK_1) { setCurrentObject(1); break; }
+                    else if (event.key.keysym.sym == SDLK_2) { setCurrentObject(2); break; }
                     else if (event.key.keysym.sym != SDLK_ESCAPE) break;
 
                 case SDL_QUIT : done = 1; break;
@@ -111,22 +123,76 @@ int main(int argc, char* argv[])
         }
         //----------------------------------------------//
 
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        glTranslatef(0.0,0.0,distance);
-        glRotatef(pitch, 1.0f, 0.0f, 0.0f);
-        glRotatef(ang, 0.0f, 1.0f, 0.0f);
-        glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+        /* Camera control
+            Rotate pitch:   UP/DOWN
+            Rotate yaw:     SPACE
+            Rotate roll:    LEFT/RIGHT
+            Zoom In/Out:    +/-
+            posX:           a/d
+            posY:           w/s
+            posZ:           q/e
+        */
 
-        if(key_pressed[SDLK_RIGHT]) ang += ang_vel;
-        if(key_pressed[SDLK_LEFT]) ang -= ang_vel;
         if(key_pressed[SDLK_UP]) pitch += ang_vel;
         if(key_pressed[SDLK_DOWN]) pitch -= ang_vel;
+        if(key_pressed[SDLK_SPACE]) yaw += ang_vel;
+        if(key_pressed[SDLK_RIGHT]) roll += ang_vel;
+        if(key_pressed[SDLK_LEFT]) roll -= ang_vel;
+        if(key_pressed[SDLK_KP_PLUS]) scale += 0.001;
+        if(key_pressed[SDLK_KP_MINUS]) scale -= 0.001;
+        if(key_pressed[SDLK_a]) posX += 0.1;
+        if(key_pressed[SDLK_d]) posX -= 0.1;
+        if(key_pressed[SDLK_w]) posY += 0.1;
+        if(key_pressed[SDLK_s]) posY -= 0.1;
+        if(key_pressed[SDLK_q]) posZ += 0.1;
+        if(key_pressed[SDLK_e]) posZ -= 0.1;
 
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        glPushMatrix();
+
+        if (currentObject == 1)
+        {
+            glTranslatef(20+posX,posY,-50+posZ);
+            glRotatef(pitch-90, 1.0f, 0.0f, 0.0f);
+            glRotatef(yaw, 0.0f, 1.0f, 0.0f);
+            glRotatef(roll-90, 0.0f, 0.0f, 1.0f);
+            glScalef(1+scale,1+scale,1+scale);
+        }
+        else
+        {
+            glTranslatef(20,0,-50);
+            glRotatef(-90, 1.0f, 0.0f, 0.0f);
+            glRotatef(-90, 0.0f, 0.0f, 1.0f);
+            glScalef(1,1,1);
+        }
+        
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
         //Informo a OpenGL que para todas las operaciones a continuación utilice las texturas 2D cargadas
         glEnable(GL_TEXTURE_2D);
+
+        // Subobject
+        glPushMatrix();
+        if (currentObject == 2)
+        {
+            glTranslatef(10.0+posX,-15.0+posY,0+posZ);
+            glRotatef(pitch-90, 1.0f, 0.0f, 0.0f);
+            glRotatef(yaw, 0.0f, 1.0f, 0.0f);
+            glRotatef(roll, 0.0f, 0.0f, 1.0f);
+            glScalef(10+scale,10+scale,10+scale);
+        }
+        else
+        {
+            glTranslatef(10.0,-15.0,0);
+            glRotatef(-90, 1.0f, 0.0f, 0.0f);
+            glScalef(10,10,10);
+        }
+
+        glBindTexture(GL_TEXTURE_2D,texture_box);
+        obj_render(box);
+
+        glPopMatrix();
 
         if(use_shader)
         {
@@ -137,39 +203,34 @@ int main(int argc, char* argv[])
             glUniform1i(uniform_tex, 0);
             //Luego asocio la textura con el id "texture"
             glBindTexture(GL_TEXTURE_2D,texture_good);
-            glBegin(GL_TRIANGLES);
-                obj_render(knight_good);
-            glEnd();
+            obj_render(knight_good);
             shader_stop(gouraud);
         }
         else
         {
             glBindTexture(GL_TEXTURE_2D,texture_good);
-            glBegin(GL_TRIANGLES);
-                obj_render(knight_good);
-            glEnd();
+            obj_render(knight_good);
+
+            glPopMatrix();
         }
 
-        glMatrixMode(GL_MODELVIEW);
+        // Second knight, static
         glLoadIdentity();
-        glTranslatef(0.0,0.0,-3);
-        glScalef(2,2,2);
-        glRotatef(pitch, 1.0f, 0.0f, 0.0f);
-        glRotatef(ang, 0.0f, 1.0f, 0.0f);
-        glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
-
+        glTranslatef(-20.0,0.0,-50);
+        glRotatef(-90, 1.0f, 0.0f, 0.0f);
+        glRotatef(-45, 0.0f, 0.0f, 1.0f);
         glBindTexture(GL_TEXTURE_2D,texture_bad);
-        glBegin(GL_TRIANGLES);
-            obj_render(knight_bad);
-        glEnd();
+        obj_render(knight_bad);
 
         cg_repaint();
     }
     obj_free(knight_good);
     obj_free(knight_bad);
+    obj_free(box);
     shader_free(gouraud);
     glDeleteTextures(1,&texture_good);
     glDeleteTextures(1,&texture_bad);
+    glDeleteTextures(1,&texture_box);
     
     // Liberar recursos:
     cg_close();
@@ -219,4 +280,16 @@ void enableCullFace()
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CW);
+}
+
+void setCurrentObject(int i)
+{
+    currentObject = i;
+    pitch = 0.0f;
+    yaw = 0.0f;
+    roll = 0.0f;
+    scale = 0.0f;
+    posX = 0;
+    posY = 0;
+    posZ = 0;
 }

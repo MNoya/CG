@@ -104,6 +104,7 @@ Obj* obj_load(char* path)
 
 void obj_render(Obj* o)
 {
+    glBegin(GL_TRIANGLES);
     int nCaras = o->nCaras;
     //printf("Drawing OBJ of %d faces\n", nCaras);
 
@@ -120,6 +121,7 @@ void obj_render(Obj* o)
             o->listaNormalCara[i],
             o->listaTexturaCara[i]);
     }
+    glEnd();
 }
 
 void obj_free(Obj* o)
