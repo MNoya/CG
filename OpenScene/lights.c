@@ -1,6 +1,3 @@
-#include "GL/gl.h"
-#include "framework/canvas.h"
-#include "framework/mm.h"
 #include "lights.h"
 
 void loadLightning()

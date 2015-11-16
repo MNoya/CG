@@ -1,0 +1,36 @@
+node
+    model "Models/knight_texturas.obj"
+    texture "Models/knight.png"
+    position 0.0 0.0 -50.0
+    scale 1.0 1.0 1.0
+    rotation -90.0 0.0 0.0
+    node
+        model "Models/box_texturas.obj"
+        texture "Models/box.jpg"
+        position 0.0 0.0 -5.0
+        rotation 0.0 0.0 0.0
+        scale 1.0 1.0 1.0
+        node
+            light
+            position 10.0 0.0 -5.0
+            scale 1.0 1.0 1.0
+            rotation 10.0 0.0 0.0
+            color 32.0 32.0 32.0 32.0
+        end
+    end
+    node
+        light
+        position 300.0 0.0 -5.0
+        scale 1.0 1.0 1.0
+        rotation 30.0 0.0 0.0
+        color 1.0 0.0 1.0 1.0
+    end
+end
+
+node
+    model "Models/knight_texturas.obj"
+    texture "Models/knight.png"
+    position 0.0 0.0 -50.0
+    scale 1.0 1.0 1.0
+    rotation 90.0 0.0 0.0
+end

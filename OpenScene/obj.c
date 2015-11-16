@@ -1,6 +1,3 @@
-#include "GL/gl.h"
-#include "framework/canvas.h"
-#include "framework/mm.h"
 #include "obj.h"
 
 Obj* obj_load(char* path)
@@ -14,8 +11,7 @@ Obj* obj_load(char* path)
 
     cg_free(contVec); //Necessary?
 
-    Vec3f* listaVertices = (Vec3f*) cg_malloc(sizeof(Vec3f) * nVertices);
-    
+    Vec3f* listaVertices = (Vec3f*) cg_malloc(sizeof(Vec3f) * nVertices);   
     Vec3i* listaCaras = (Vec3i*) cg_malloc(sizeof(Vec3i) * nCaras);
     Vec3i* listaNormalCara = (Vec3i*) cg_malloc(sizeof(Vec3i) * nCaras);
     Vec3i* listaTexturaCara = (Vec3i*) cg_malloc(sizeof(Vec3i)* nCaras);    
@@ -46,8 +42,8 @@ Obj* obj_load(char* path)
             fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z );
           
             listaVertices[o->nVertices] = vertex;
-            printf("\nVertice %d: ",o->nVertices);
-            printVector(vertex); 
+            //printf("\nVertice %d: ",o->nVertices);
+            //printVector(vertex); 
             o->nVertices++;
         }
 
@@ -76,8 +72,8 @@ Obj* obj_load(char* path)
         {
             Vec3f normal;
             fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z ); 
-            printf("\nNormal %d: ",o->nNormales);
-            printVector(normal); 
+            //printf("\nNormal %d: ",o->nNormales);
+            //printVector(normal); 
             listaNormales[o->nNormales] = normal;  
             o->nNormales++; 
         }
@@ -99,6 +95,9 @@ Obj* obj_load(char* path)
     o->listaNormalCara = listaNormalCara;
     o->listaTexturas = listaTexturas;
     o->listaTexturaCara = listaTexturaCara;
+
+    printf("\nDone parsing %s",path);
+    printf("\nCaras: %d\nVertices: %d\nNormales: %d\nTexturas: %d",o->nCaras,o->nVertices,o->nNormales,o->nTexturas);
 
     return o;
 }

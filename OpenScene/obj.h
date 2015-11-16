@@ -1,3 +1,6 @@
+#ifndef OBJ_H
+#define OBJ_H
+
 #include "framework/canvas.h"
 #include "framework/mm.h"
 #include "GL/gl.h" //open gl magic
@@ -54,3 +57,5 @@ int GetTexture(char* verticeANormal);
 void DrawTriangle(Obj* unObj, Vec3f v1, Vec3f v2, Vec3f v3, Vec3i normalcara, Vec3i texturacara);
 void printVector(Vec3f v);
 void printVectorIntegers(Vec3i v);
+
+#endif //OBJ_H

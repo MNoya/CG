@@ -10,6 +10,7 @@
 #include "obj.h"
 #include "lights.h"
 #include "shader.h"
+#include "scene.h"
 
 #include <SDL/SDL_image.h>
 
@@ -35,6 +36,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 #endif
+
     printf("GL Version: %s\n", glGetString(GL_VERSION));
     printf("GLSL Version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
     glClearColor(0,0,1,0.1); //Background color
@@ -62,14 +64,16 @@ int main(int argc, char* argv[])
 
     unsigned char key_pressed[1024];
     memset(key_pressed, 0, 1024);
+    
+    printf("Loading models\n");
+    Obj* knight_good = obj_load("Models/knight_texturas.obj");
+    Obj* knight_bad = obj_load("Models/box_texturas.obj");
 
-    char* modelName = "Models/knight_texturas.obj";
-    char* textureName = "Models/knight_good.png";
-    Obj* model = obj_load(modelName);
-    printf("\nDone parsing %s",modelName);
-    printf("\nCaras: %d\nVertices: %d\nNormales: %d\nTexturas: %d",model->nCaras,model->nVertices,model->nNormales,model->nTexturas);
+    printf("\nLoading textures\n");
+    GLuint texture_good = texture_load("Models/knight_good.png");
+    GLuint texture_bad = texture_load("Models/box.jpg");
 
-    printf("\nLoading shaders");
+    printf("Loading shaders\n");
     char use_shader = 0;
     char specular = 0;
     Shader gouraud = shader_new("shaders/gouraud_vp.glsl", "shaders/gouraud_fp.glsl");
@@ -77,19 +81,16 @@ int main(int argc, char* argv[])
     GLint uniform_especular = shader_get_unif_loc(gouraud, "especular");
     GLint uniform_tex = shader_get_unif_loc(gouraud, "tex");
 
-    printf("\nLoading texture %s ",textureName);
-    GLuint texture = texture_load(textureName);
-
-    printf("Done, drawing...");
+    printf("Done, drawing...\n");
 
     while (!done)
     {
-        /* Process Keypresses
+         Process Keypresses
             p: shader
             s: specular
             z: z-buffer
             m: wireframe
-        */
+        
         SDL_Event event;
         while(SDL_PollEvent(&event))
         {
@@ -101,7 +102,7 @@ int main(int argc, char* argv[])
                     else if (event.key.keysym.sym == SDLK_s) { specular = !specular; break; }
                     else if (event.key.keysym.sym == SDLK_z) { zbuff = !zbuff; zbuff ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST); break; }
                     else if (event.key.keysym.sym == SDLK_m) { wireframe = !wireframe; wireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break; }
-                    else if (event.key.keysym.sym == SDLK_b) { bfc = !bfc; bfc ? enableCullFace() : glDisable(GL_CULL_FACE); }
+                    else if (event.key.keysym.sym == SDLK_b) { bfc = !bfc; bfc ? enableCullFace() : glDisable(GL_CULL_FACE); break; }
                     else if (event.key.keysym.sym != SDLK_ESCAPE) break;
 
                 case SDL_QUIT : done = 1; break;
@@ -135,25 +136,40 @@ int main(int argc, char* argv[])
             //que es donde cargué mi textura.
             glUniform1i(uniform_tex, 0);
             //Luego asocio la textura con el id "texture"
-            glBindTexture(GL_TEXTURE_2D,texture);
+            glBindTexture(GL_TEXTURE_2D,texture_good);
             glBegin(GL_TRIANGLES);
-                obj_render(model);
+                obj_render(knight_good);
             glEnd();
             shader_stop(gouraud);
         }
         else
         {
-            glBindTexture(GL_TEXTURE_2D,texture);
+            glBindTexture(GL_TEXTURE_2D,texture_good);
             glBegin(GL_TRIANGLES);
-                obj_render(model);
+                obj_render(knight_good);
             glEnd();
         }
 
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        glTranslatef(0.0,0.0,-3);
+        glScalef(2,2,2);
+        glRotatef(pitch, 1.0f, 0.0f, 0.0f);
+        glRotatef(ang, 0.0f, 1.0f, 0.0f);
+        glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+
+        glBindTexture(GL_TEXTURE_2D,texture_bad);
+        glBegin(GL_TRIANGLES);
+            obj_render(knight_bad);
+        glEnd();
+
         cg_repaint();
     }
-    obj_free(model);
-    //shader_free(gouraud);
-    glDeleteTextures(1,&texture);
+    obj_free(knight_good);
+    obj_free(knight_bad);
+    shader_free(gouraud);
+    glDeleteTextures(1,&texture_good);
+    glDeleteTextures(1,&texture_bad);
     
     // Liberar recursos:
     cg_close();
