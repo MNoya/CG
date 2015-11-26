@@ -84,7 +84,7 @@ Obj* obj_load(char* path)
             o->nTexturas++; 
         }
 
-        res = fscanf(file, "%s", line);;
+        res = fscanf(file, "%s", line);
 
     } while (res != EOF);
 

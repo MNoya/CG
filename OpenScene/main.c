@@ -70,6 +70,8 @@ int main(int argc, char* argv[])
 
     unsigned char key_pressed[1024];
     memset(key_pressed, 0, 1024);
+
+    parse_scene("Scenes/scene1.txt");
     
     printf("Loading models\n");
     Obj* knight_good = obj_load("Models/knight_texturas.obj");

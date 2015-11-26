@@ -1,12 +1,12 @@
 node
-    model "Models/knight_texturas.obj"
-    texture "Models/knight.png"
+    model Models/knight_texturas.obj
+    texture Models/knight.png
     position 0.0 0.0 -50.0
     scale 1.0 1.0 1.0
     rotation -90.0 0.0 0.0
     node
-        model "Models/box_texturas.obj"
-        texture "Models/box.jpg"
+        model Models/box_texturas.obj
+        texture Models/box.jpg
         position 0.0 0.0 -5.0
         rotation 0.0 0.0 0.0
         scale 1.0 1.0 1.0
@@ -28,8 +28,8 @@ node
 end
 
 node
-    model "Models/knight_texturas.obj"
-    texture "Models/knight.png"
+    model Models/knight_texturas.obj
+    texture Models/knight.png
     position 0.0 0.0 -50.0
     scale 1.0 1.0 1.0
     rotation 90.0 0.0 0.0
