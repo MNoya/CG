@@ -9,7 +9,7 @@ Obj* obj_load(char* path)
     int nNormales = contVec->nNormales;
     int nTexturas = contVec->nTexturas;
 
-    cg_free(contVec); //Necessary?
+    printf("\nParsing %s...",path);
 
     Vec3f* listaVertices = (Vec3f*) cg_malloc(sizeof(Vec3f) * nVertices);   
     Vec3i* listaCaras = (Vec3i*) cg_malloc(sizeof(Vec3i) * nCaras);
@@ -96,8 +96,9 @@ Obj* obj_load(char* path)
     o->listaTexturas = listaTexturas;
     o->listaTexturaCara = listaTexturaCara;
 
-    printf("\nDone parsing %s",path);
     printf("\nCaras: %d\nVertices: %d\nNormales: %d\nTexturas: %d",o->nCaras,o->nVertices,o->nNormales,o->nTexturas);
+
+    cg_free(contVec);
 
     return o;
 }
@@ -159,6 +160,11 @@ void obj_free(Obj* o)
 ObjData* CountLines(char* path)
 {
 	FILE *file = fopen ( path, "r" );
+    if( file == NULL ){
+        printf("File %s error!\n",path);
+        return 0;
+    }
+
 	ObjData* result = (ObjData*) cg_malloc(sizeof(ObjData));
     const char space[2] = " ";
     if (file)

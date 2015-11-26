@@ -3,7 +3,7 @@
 
 #include "framework/canvas.h"
 #include "framework/mm.h"
-#include "GL/gl.h" //open gl magic
+#include "GL/gl.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
