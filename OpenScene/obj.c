@@ -30,12 +30,10 @@ Obj* obj_load(char* path)
         return 0;
     }
 
-    int res;
+    char line [ 128 ];
+    int res = fscanf(file, "%s", line);;
     do
     {
-        char line [ 128 ];
-        res = fscanf(file, "%s", line);
-
         if (strcmp(line,"v")==0)
         {
             Vec3f vertex;
@@ -85,6 +83,9 @@ Obj* obj_load(char* path)
             listaTexturas[o->nTexturas] = vt;  
             o->nTexturas++; 
         }
+
+        res = fscanf(file, "%s", line);;
+
     } while (res != EOF);
 
     fclose(file);
