@@ -17,15 +17,23 @@
 #include "obj.h"
 #include "texture.h"
 
+typedef enum
+{
+    ROOT = 0,
+    MODEL,
+    LIGHT
+} node_type;
+
 typedef struct node
 {
-    int type;
+    node_type type;
     Vec3f position;
     Vec3f scale;
     Vec3f rotation;
 
     // Model
     Obj* object;
+    char* name;
     GLuint texture;
 
     // Light
@@ -33,11 +41,12 @@ typedef struct node
     Vec3f color;
 
     int nChilds;
-    struct node* childs;
-} scene_node;
+    struct node *childs[10];
+} scene_node; //'struct node'
 
-int parse_scene(char* path);
+scene_node* parse_scene(char* path);
 scene_node* parse_node(FILE* file, char* line, int depth);
 void render_node(scene_node* n);
+void scene_free(scene_node* n);
 
 #endif //SCENE_H

@@ -9,7 +9,7 @@ Obj* obj_load(char* path)
     int nNormales = contVec->nNormales;
     int nTexturas = contVec->nTexturas;
 
-    printf("\nParsing %s...",path);
+    //printf("\nParsing %s...",path);
 
     Vec3f* listaVertices = (Vec3f*) cg_malloc(sizeof(Vec3f) * nVertices);   
     Vec3i* listaCaras = (Vec3i*) cg_malloc(sizeof(Vec3i) * nCaras);
@@ -31,7 +31,7 @@ Obj* obj_load(char* path)
     }
 
     char line [ 128 ];
-    int res = fscanf(file, "%s", line);;
+    int res = fscanf(file, "%s", line);
     do
     {
         if (strcmp(line,"v")==0)
@@ -97,7 +97,7 @@ Obj* obj_load(char* path)
     o->listaTexturas = listaTexturas;
     o->listaTexturaCara = listaTexturaCara;
 
-    printf("\nCaras: %d\nVertices: %d\nNormales: %d\nTexturas: %d",o->nCaras,o->nVertices,o->nNormales,o->nTexturas);
+    //printf("\nCaras: %d\nVertices: %d\nNormales: %d\nTexturas: %d",o->nCaras,o->nVertices,o->nNormales,o->nTexturas);
 
     cg_free(contVec);
 
@@ -128,31 +128,31 @@ void obj_render(Obj* o)
 
 void obj_free(Obj* o)
 {
-    printf("Freeing Object\n");
+    //printf("Freeing Object\n");
     int nVertices = o->nVertices;
     int nCaras = o->nCaras;
     int nNormales = o->nNormales;
 
     // Free struct
-    printf("Free listaVertices: %p\n",o->listaVertices);
+    //printf("Free listaVertices: %p\n",o->listaVertices);
     cg_free(o->listaVertices);
 
-    printf("Free listaCaras: %p\n",o->listaCaras);
+    //printf("Free listaCaras: %p\n",o->listaCaras);
     cg_free(o->listaCaras);
     
-    printf("Free listaNormales: %p\n",o->listaNormales);
+    //printf("Free listaNormales: %p\n",o->listaNormales);
     cg_free(o->listaNormales);
 
-    printf("Free listaNormalCara: %p\n",o->listaNormalCara);
+    //printf("Free listaNormalCara: %p\n",o->listaNormalCara);
     cg_free(o->listaNormalCara); 
 
-    printf("Free listaTexturaCara: %p\n",o->listaTexturaCara);
+    //printf("Free listaTexturaCara: %p\n",o->listaTexturaCara);
     cg_free(o->listaTexturaCara);
 
-    printf("Free listaTexturas: %p\n",o->listaTexturas);
+    //printf("Free listaTexturas: %p\n",o->listaTexturas);
     cg_free(o->listaTexturas); 
 
-    printf("Free obj: %p\n",o);
+    //printf("Free obj: %p\n",o);
     cg_free(o);
 }
 

@@ -66,14 +66,14 @@ int main(int argc, char* argv[])
     char use_shader = 0;
     char specular = 0;
     char light = 1;
-    loadLightning();
+    //loadLightning();
 
     unsigned char key_pressed[1024];
     memset(key_pressed, 0, 1024);
 
-    parse_scene("Scenes/scene1.txt");
+    scene_node* Scene = parse_scene("Scenes/scene1.txt");
     
-    printf("Loading models\n");
+    /*printf("Loading models\n");
     Obj* knight_good = obj_load("Models/knight_texturas.obj");
     Obj* knight_bad = obj_load("Models/knight_texturas.obj");
     Obj* box = obj_load("Models/box_texturas.obj");
@@ -90,6 +90,7 @@ int main(int argc, char* argv[])
     GLint uniform_tex = shader_get_unif_loc(gouraud, "tex");
 
     printf("Done, drawing...\n");
+    */
 
     while (!done)
     {
@@ -148,88 +149,25 @@ int main(int argc, char* argv[])
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        glPushMatrix();
 
-        if (currentObject == 1)
-        {
-            glTranslatef(20+posX,posY,-50+posZ);
-            glRotatef(pitch-90, 1.0f, 0.0f, 0.0f);
-            glRotatef(yaw, 0.0f, 1.0f, 0.0f);
-            glRotatef(roll-90, 0.0f, 0.0f, 1.0f);
-            glScalef(1+scale,1+scale,1+scale);
-        }
-        else
-        {
-            glTranslatef(20,0,-50);
-            glRotatef(-90, 1.0f, 0.0f, 0.0f);
-            glRotatef(-90, 0.0f, 0.0f, 1.0f);
-            glScalef(1,1,1);
-        }
-        
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-        //Informo a OpenGL que para todas las operaciones a continuación utilice las texturas 2D cargadas
         glEnable(GL_TEXTURE_2D);
 
-        // Subobject
-        glPushMatrix();
-        if (currentObject == 2)
-        {
-            glTranslatef(10.0+posX,-15.0+posY,0+posZ);
-            glRotatef(pitch-90, 1.0f, 0.0f, 0.0f);
-            glRotatef(yaw, 0.0f, 1.0f, 0.0f);
-            glRotatef(roll, 0.0f, 0.0f, 1.0f);
-            glScalef(10+scale,10+scale,10+scale);
-        }
-        else
-        {
-            glTranslatef(10.0,-15.0,0);
-            glRotatef(-90, 1.0f, 0.0f, 0.0f);
-            glScalef(10,10,10);
-        }
-
-        glBindTexture(GL_TEXTURE_2D,texture_box);
-        obj_render(box);
-
-        glPopMatrix();
-
-        if(use_shader)
-        {
-            shader_use(gouraud);
-            glUniform1i(uniform_especular, specular);
-            //Le digo al shader que el sampler2D de nombre "tex" se corresponde con GL_TEXTURE0
-            //que es donde cargué mi textura.
-            glUniform1i(uniform_tex, 0);
-            //Luego asocio la textura con el id "texture"
-            glBindTexture(GL_TEXTURE_2D,texture_good);
-            obj_render(knight_good);
-            shader_stop(gouraud);
-        }
-        else
-        {
-            glBindTexture(GL_TEXTURE_2D,texture_good);
-            obj_render(knight_good);
-
-            glPopMatrix();
-        }
-
-        // Second knight, static
-        glLoadIdentity();
-        glTranslatef(-20.0,0.0,-50);
-        glRotatef(-90, 1.0f, 0.0f, 0.0f);
-        glRotatef(-45, 0.0f, 0.0f, 1.0f);
-        glBindTexture(GL_TEXTURE_2D,texture_bad);
-        obj_render(knight_bad);
+        render_node(Scene);
 
         cg_repaint();
     }
-    obj_free(knight_good);
+
+    /*obj_free(knight_good);
     obj_free(knight_bad);
     obj_free(box);
     shader_free(gouraud);
     glDeleteTextures(1,&texture_good);
     glDeleteTextures(1,&texture_bad);
-    glDeleteTextures(1,&texture_box);
+    glDeleteTextures(1,&texture_box);*/
+
+    printf("--------------------\n");
+    scene_free(Scene);
     
     // Liberar recursos:
     cg_close();

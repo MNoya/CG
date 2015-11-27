@@ -1,16 +1,19 @@
 node
+    childs 2
     model Models/knight_texturas.obj
     texture Models/knight.png
-    position 0.0 0.0 -50.0
+    position 20.0 0.0 -50.0
     scale 1.0 1.0 1.0
-    rotation -90.0 0.0 0.0
+    rotation -90.0 0.0 -90.0
     node
+        childs 1
         model Models/box_texturas.obj
         texture Models/box.jpg
-        position 0.0 0.0 -5.0
+        position 10.0 -15.0 0.0
+        scale 10.0 10.0 10.0
         rotation 0.0 0.0 0.0
-        scale 1.0 1.0 1.0
         node
+            childs 0
             light
             position 10.0 0.0 -5.0
             scale 1.0 1.0 1.0
@@ -19,6 +22,7 @@ node
         end
     end
     node
+        childs 0
         light
         position 300.0 0.0 -5.0
         scale 1.0 1.0 1.0
@@ -28,9 +32,10 @@ node
 end
 
 node
+    childs 0
     model Models/knight_texturas.obj
     texture Models/knight.png
-    position 0.0 0.0 -50.0
+    position -20.0 0.0 -50.0
     scale 1.0 1.0 1.0
-    rotation 90.0 0.0 0.0
+    rotation -90.0 0.0 -45.0
 end
