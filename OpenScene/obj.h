@@ -34,6 +34,13 @@ typedef struct {
 } Vec3f;
 
 typedef struct {
+    float r;
+    float g;
+    float b;
+    float a;
+} RGBA;
+
+typedef struct {
     Vec3f* listaVertices;
     Vec3i* listaCaras;
     Vec3f* listaNormales;

@@ -16,6 +16,7 @@
 #include <assert.h>
 #include "obj.h"
 #include "texture.h"
+#include "shader.h"
 
 typedef enum
 {
@@ -37,8 +38,12 @@ typedef struct node
     GLuint texture;
 
     // Light
-    int nLight;
-    Vec3f color;
+    int nLight; //GL_LIGHT0=16384
+    int lightOn; //bool
+    float light_type; //1=puntual, 0=direccional
+    RGBA ambient;
+    RGBA diffuse;
+    RGBA specular;
 
     int nChilds;
     struct node *childs[10];
@@ -46,7 +51,8 @@ typedef struct node
 
 scene_node* parse_scene(char* path);
 scene_node* parse_node(FILE* file, char* line, int depth);
-void render_node(scene_node* n);
+void render_node(scene_node* n, int level, Vec3f translation, Vec3f rotation, float scale, 
+                int use_shader, int specular, Shader shader, GLuint uniform_especular, GLuint uniform_tex);
 void scene_free(scene_node* n);
 
 #endif //SCENE_H

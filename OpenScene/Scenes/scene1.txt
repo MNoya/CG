@@ -1,41 +1,68 @@
 node
-    childs 2
     model Models/knight_texturas.obj
     texture Models/knight.png
     position 20.0 0.0 -50.0
-    scale 1.0 1.0 1.0
+    scale 0.5 0.5 0.5
     rotation -90.0 0.0 -90.0
     node
-        childs 1
         model Models/box_texturas.obj
         texture Models/box.jpg
         position 10.0 -15.0 0.0
         scale 10.0 10.0 10.0
-        rotation 0.0 0.0 0.0
+        rotation 10.0 45.0 0.0
         node
-            childs 0
             light
-            position 10.0 0.0 -5.0
+            type 0
+            position 0.0 0.0 0.0
             scale 1.0 1.0 1.0
             rotation 10.0 0.0 0.0
-            color 32.0 32.0 32.0 32.0
+            ambient 0.1 0.1 0.1 1.0
+            diffuse 1.0 0.0 0.0 1.0
+            specular 1.0 1.0 1.0 1.0
         end
-    end
-    node
-        childs 0
-        light
-        position 300.0 0.0 -5.0
-        scale 1.0 1.0 1.0
-        rotation 30.0 0.0 0.0
-        color 1.0 0.0 1.0 1.0
     end
 end
 
 node
-    childs 0
+    model Models/knight_texturas.obj
+    texture Models/knight_good.png
+    position 0.0 0.0 -50.0
+    scale 0.5 0.5 0.5
+    rotation -90.0 0.0 -90.0
+    node
+        model Models/box_texturas.obj
+        texture Models/box.jpg
+        position 10.0 -15.0 0.0
+        scale 10.0 10.0 10.0
+        rotation 10.0 45.0 0.0
+        node
+            light
+            type 0
+            position 0.0 0.0 0.0
+            scale 1.0 1.0 1.0
+            rotation 10.0 0.0 0.0
+            ambient 0.1 0.1 0.1 1.0
+            diffuse 1.0 0.0 0.0 1.0
+            specular 1.0 1.0 1.0 1.0
+        end
+    end
+end
+
+node
     model Models/knight_texturas.obj
     texture Models/knight.png
     position -20.0 0.0 -50.0
-    scale 1.0 1.0 1.0
+    scale 0.5 0.5 0.5
     rotation -90.0 0.0 -45.0
+    node
+        childs 0
+        light
+        type 1
+        position 0.0 0.0 0.0
+        scale 1.0 1.0 1.0
+        rotation 0.0 0.0 0.0
+        ambient 1.0 0.1 0.1 1.0
+        diffuse 0.0 1.0 0.0 1.0
+        specular 0.0 1.0 1.0 1.0
+    end
 end

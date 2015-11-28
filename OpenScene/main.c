@@ -65,32 +65,22 @@ int main(int argc, char* argv[])
     glEnable(GL_DEPTH_TEST); // Z-Buffer
     char use_shader = 0;
     char specular = 0;
+    glEnable(GL_LIGHTING); // Lights on by default
     char light = 1;
-    //loadLightning();
 
     unsigned char key_pressed[1024];
     memset(key_pressed, 0, 1024);
 
+    printf("Loading scene graph\n");
     scene_node* Scene = parse_scene("Scenes/scene1.txt");
-    
-    /*printf("Loading models\n");
-    Obj* knight_good = obj_load("Models/knight_texturas.obj");
-    Obj* knight_bad = obj_load("Models/knight_texturas.obj");
-    Obj* box = obj_load("Models/box_texturas.obj");
-
-    printf("\nLoading textures\n");
-    GLuint texture_good = texture_load("Models/knight_good.png");
-    GLuint texture_bad = texture_load("Models/knight.png");
-    GLuint texture_box = texture_load("Models/box.jpg");
 
     printf("Loading shaders\n");
     Shader gouraud = shader_new("shaders/gouraud_vp.glsl", "shaders/gouraud_fp.glsl");
-    
+
     GLint uniform_especular = shader_get_unif_loc(gouraud, "especular");
     GLint uniform_tex = shader_get_unif_loc(gouraud, "tex");
 
-    printf("Done, drawing...\n");
-    */
+    printf("Done, drawing...\n");   
 
     while (!done)
     {
@@ -100,6 +90,7 @@ int main(int argc, char* argv[])
             n: z-buffer
             m: wireframe
             b: b-culling
+            t: lights
         */
         SDL_Event event;
         while(SDL_PollEvent(&event))
@@ -113,8 +104,12 @@ int main(int argc, char* argv[])
                     else if (event.key.keysym.sym == SDLK_z) { zbuff = !zbuff; zbuff ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST); break; }
                     else if (event.key.keysym.sym == SDLK_m) { wireframe = !wireframe; wireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break; }
                     else if (event.key.keysym.sym == SDLK_b) { bfc = !bfc; bfc ? enableCullFace() : glDisable(GL_CULL_FACE); break; }
-                    else if (event.key.keysym.sym == SDLK_1) { setCurrentObject(1); break; }
-                    else if (event.key.keysym.sym == SDLK_2) { setCurrentObject(2); break; }
+                    else if (event.key.keysym.sym == SDLK_t) { light = !light; light? glEnable(GL_LIGHTING) : glDisable(GL_LIGHTING); break; }
+                    else if (event.key.keysym.sym == SDLK_1) { printf("1\n"); break; }
+                    else if (event.key.keysym.sym == SDLK_2) { printf("2\n"); break; }
+                    else if (event.key.keysym.sym == SDLK_3) { printf("3\n"); break; }
+                    else if (event.key.keysym.sym == SDLK_4) { printf("4\n"); break; }
+                    else if (event.key.keysym.sym == SDLK_5) { printf("5\n"); break; }
                     else if (event.key.keysym.sym != SDLK_ESCAPE) break;
 
                 case SDL_QUIT : done = 1; break;
@@ -153,23 +148,29 @@ int main(int argc, char* argv[])
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
         glEnable(GL_TEXTURE_2D);
 
-        render_node(Scene);
+        glPushMatrix();
+        glTranslatef(posX, posY, posZ);
+        glRotatef(pitch, 1.0f, 0.0f, 0.0f);
+        glRotatef(yaw, 0.0f, 1.0f, 0.0f);
+        glRotatef(roll, 0.0f, 0.0f, 1.0f);
+
+        Vec3f translation = {posX, posY, posZ};
+        Vec3f rotation = {pitch, yaw, roll};
+        int level = 0;
+
+        render_node(Scene, level, translation, rotation, scale, use_shader, specular, gouraud, uniform_especular, uniform_tex);
+
+        glPopMatrix();
 
         cg_repaint();
     }
 
-    /*obj_free(knight_good);
-    obj_free(knight_bad);
-    obj_free(box);
-    shader_free(gouraud);
-    glDeleteTextures(1,&texture_good);
-    glDeleteTextures(1,&texture_bad);
-    glDeleteTextures(1,&texture_box);*/
-
     printf("--------------------\n");
+    shader_free(gouraud);
     scene_free(Scene);
     
-    // Liberar recursos:
+    // Liberar recursos
+    cg_memcheck();
     cg_close();
 
     return 0;
@@ -180,16 +181,4 @@ void enableCullFace()
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CW);
-}
-
-void setCurrentObject(int i)
-{
-    currentObject = i;
-    pitch = 0.0f;
-    yaw = 0.0f;
-    roll = 0.0f;
-    scale = 0.0f;
-    posX = 0;
-    posY = 0;
-    posZ = 0;
 }
