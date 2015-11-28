@@ -98,6 +98,24 @@ scene_node* parse_node(FILE* file, char* line, int depth)
             fscanf(file, "rotation %f %f %f\n", &rotation.x, &rotation.y, &rotation.z);
             printf("\nRotation: "); printVector(rotation); printf("\n");
             n->rotation = rotation;
+
+            RGBA mat_diffuse;
+            fscanf(file, "%s\n", line);
+            fscanf(file, "%f %f %f %f\n", &mat_diffuse.r, &mat_diffuse.g, &mat_diffuse.b, &mat_diffuse.a);
+            printf("\nMat Diffuse: %f %f %f %f", mat_diffuse.r, mat_diffuse.g, mat_diffuse.b, mat_diffuse.a); 
+            n->diffuse = mat_diffuse;
+
+            RGBA mat_specular;
+            fscanf(file, "%s\n", line);
+            fscanf(file, "%f %f %f %f\n", &mat_specular.r, &mat_specular.g, &mat_specular.b, &mat_specular.a);
+            printf("\nSpecular: %f %f %f %f", mat_specular.r, mat_specular.g, mat_specular.b, mat_specular.a);
+            n->specular = mat_specular;
+
+            int shininess;
+            fscanf(file, "%s\n", line);
+            fscanf(file, "%d\n", &shininess);
+            printf("\nShininess: %d", shininess);
+            n->shininess = shininess;
         }
 
         else if (strcmp(line,"light")==0)
@@ -161,8 +179,6 @@ scene_node* parse_node(FILE* file, char* line, int depth)
         fscanf(file, "%s\n", line);
     }
 
-    printf("END\n");
-
     n->nChilds = currentChild;
     return n;
 }
@@ -193,7 +209,13 @@ void render_node(scene_node* node, int camera_option, Vec3f translation, Vec3f r
     glScalef(node->scale.x,node->scale.y,node->scale.z);
 
     if ( node->type == MODEL )
-    {        
+    {   
+        float diffuse[] = {node->diffuse.r,node->diffuse.g,node->diffuse.b,node->diffuse.a};
+        float specular[] = {node->specular.r,node->specular.g,node->specular.b,node->specular.a};
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+        glMateriali(GL_FRONT, GL_SHININESS, node->shininess);
+
         if (use_shader)
         {
             shader_use(shader);
@@ -209,6 +231,7 @@ void render_node(scene_node* node, int camera_option, Vec3f translation, Vec3f r
             obj_render( node->object );
         }
     }
+
     else if ( node->type == LIGHT)
     {
         int lightN = node->nLight+16384; //Adjust unsigned int

@@ -8,7 +8,7 @@
 #endif
 
 #include "obj.h"
-#include "lights.h"
+#include "texture.h"
 #include "shader.h"
 #include "scene.h"
 
@@ -16,6 +16,7 @@ void toggleZBuff(char bEnabled);
 void toggleWireframe(char bEnabled);
 void toggleBackfaceCulling(char bEnabled);
 void toggleLights(char bEnabled);
+void resetValues();
 
 // Scene values
 float pitch = 0.0f;
@@ -26,11 +27,12 @@ float ang_vel = 0.1f;
 float posX = 0;
 float posY = 0;
 float posZ = 0;
+int cw = 600;
+int ch = 600;
 
 int main(int argc, char* argv[])
 {
-    int cw = 600;
-    int ch = 600;
+
 
     cg_init(cw, ch, NULL);
 
@@ -46,10 +48,9 @@ int main(int argc, char* argv[])
         return -1;
     }
 #endif
-
     printf("GL Version: %s\n", glGetString(GL_VERSION));
     printf("GLSL Version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
-    glClearColor(0,0,1,0.1); //Background color
+    glClearColor(0,0,0,0.1); //Background color
     
     // Actualizar la pantalla:
     glMatrixMode(GL_MODELVIEW); //Applies subsequent matrix operations to the modelview matrix stack.
@@ -69,11 +70,29 @@ int main(int argc, char* argv[])
     glEnable(GL_LIGHTING); // Lights on by default
     char light = 1;
 
+        // Scene chooser
+    int scene_chosen = 0;
+    char* scene_path;
+    while (!scene_chosen)
+    {
+        SDL_Event event_choice;
+        while(SDL_PollEvent(&event_choice))
+        {
+            switch (event_choice.type)
+            {
+                case SDL_KEYDOWN:
+                    if (event_choice.key.keysym.sym == SDLK_1) {scene_chosen=1; scene_path = "Scenes/scene1.txt"; break; }
+                    if (event_choice.key.keysym.sym == SDLK_2) {scene_chosen=1; scene_path = "Scenes/scene2.txt"; break; }
+            }
+        }
+    }
+    //----------------------------------------------//
+
     unsigned char key_pressed[1024];
     memset(key_pressed, 0, 1024);
 
     printf("Loading scene graph\n");
-    scene_node* Scene = parse_scene("Scenes/scene1.txt");
+    scene_node* Scene = parse_scene(scene_path);
 
     printf("Loading shaders\n");
     Shader gouraud = shader_new("shaders/gouraud_vp.glsl", "shaders/gouraud_fp.glsl");
@@ -148,14 +167,14 @@ int main(int argc, char* argv[])
         if(key_pressed[SDLK_SPACE]) yaw += ang_vel;
         if(key_pressed[SDLK_RIGHT]) roll += ang_vel;
         if(key_pressed[SDLK_LEFT]) roll -= ang_vel;
-        if(key_pressed[SDLK_KP_PLUS]) scale += 0.001;
-        if(key_pressed[SDLK_KP_MINUS]) scale -= 0.001;
+        if(key_pressed[SDLK_KP_PLUS]) scale += 0.01;
+        if(key_pressed[SDLK_KP_MINUS]) scale -= 0.01;
         if(key_pressed[SDLK_a]) posX += 0.1;
         if(key_pressed[SDLK_d]) posX -= 0.1;
         if(key_pressed[SDLK_w]) posY += 0.1;
         if(key_pressed[SDLK_s]) posY -= 0.1;
-        if(key_pressed[SDLK_q]) posZ += 0.1;
-        if(key_pressed[SDLK_e]) posZ -= 0.1;
+        if(key_pressed[SDLK_q]) posZ += 0.01;
+        if(key_pressed[SDLK_e]) posZ -= 0.01;
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
@@ -166,6 +185,12 @@ int main(int argc, char* argv[])
         Vec3f translation = {posX, posY, posZ};
         Vec3f rotation = {pitch, yaw, roll};
         render_node(Scene, camera_option, translation, rotation, scale, use_shader, specular, gouraud, uniform_especular, uniform_tex);
+
+        if (camera_option == 0)
+        {
+            if (scale != 0) printf("Scene scale: %f\n",Scene->scale.x);
+            if (translation.x != 0) printf("Scene X %f\n",Scene->position.x);
+        }
 
         resetValues();
         cg_repaint();
@@ -210,7 +235,6 @@ void resetValues()
     yaw = 0.0f;
     roll = 0.0f;
     scale = 0.0f;
-    ang_vel = 0.1f;
     posX = 0;
     posY = 0;
     posZ = 0;

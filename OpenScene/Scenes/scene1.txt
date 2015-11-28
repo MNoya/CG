@@ -1,15 +1,21 @@
 node
     model Models/knight_texturas.obj
     texture Models/knight.png
-    position 20.0 0.0 -50.0
+    position 20.0 0.0 -60.0
     scale 0.5 0.5 0.5
     rotation -90.0 0.0 -90.0
+    diffuse 0.2 0.2 0.2 1.0
+    specular 1.0 1.0 1.0 1.0
+    shininess 32
     node
         model Models/box_texturas.obj
         texture Models/box.jpg
         position 10.0 -15.0 0.0
         scale 10.0 10.0 10.0
         rotation 10.0 45.0 0.0
+        diffuse 0.2 0.2 0.2 1.0
+        specular 1.0 1.0 1.0 1.0
+        shininess 32
     end
     node
         light
@@ -29,12 +35,18 @@ node
     position 0.0 0.0 -50.0
     scale 0.5 0.5 0.5
     rotation -90.0 0.0 -90.0
+    diffuse 0.2 0.2 0.2 1.0
+    specular 1.0 1.0 1.0 1.0
+    shininess 32
     node
         model Models/box_texturas.obj
         texture Models/box.jpg
         position 10.0 -15.0 0.0
         scale 10.0 10.0 10.0
         rotation 10.0 45.0 0.0
+        diffuse 0.2 0.2 0.2 1.0
+        specular 1.0 1.0 1.0 1.0
+        shininess 32
     end
     node
         light
@@ -54,12 +66,18 @@ node
     position -20.0 0.0 -50.0
     scale 0.5 0.5 0.5
     rotation -90.0 0.0 -45.0
+    diffuse 0.2 0.2 0.2 1.0
+    specular 1.0 1.0 1.0 1.0
+    shininess 32
     node
         model Models/box_texturas.obj
         texture Models/box.jpg
         position 10.0 -15.0 0.0
         scale 10.0 10.0 10.0
         rotation 10.0 45.0 0.0
+        diffuse 0.2 0.2 0.2 1.0
+        specular 1.0 1.0 1.0 1.0
+        shininess 32
     end
     node
         light

@@ -36,6 +36,7 @@ typedef struct node
     Obj* object;
     char* name;
     GLuint texture;
+    int shininess;
 
     // Light
     int nLight; //GL_LIGHT0=16384

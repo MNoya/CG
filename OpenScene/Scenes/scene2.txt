@@ -1,0 +1,70 @@
+node
+    model Models/box_texturas.obj
+    texture Models/box.jpg
+    position 0.0 0.0 -1.0
+    scale 2 2 2
+    rotation 0.0 0.0 0.0
+    diffuse 1.0 1.0 1.0 1.0
+    specular 1.0 1.0 1.0 1.0
+    shininess 64
+    node
+        model Models/knight_texturas.obj
+        texture Models/knight.png
+        position 0.0 -0.1 -0.2
+        scale 0.015 0.015 0.015
+        rotation -90.0 0.0 -90.0
+        diffuse 1.0 0.0 0.0 1.0
+        specular 1.0 0.0 0.0 1.0
+        shininess 32
+        node //Red Light outer
+            light
+            type 0
+            position -10.0 -10.0 0.0
+            scale 1.0 1.0 1.0
+            rotation 90.0 0.0 0.0
+            ambient 1.0 0.0 0.0 1.0
+            diffuse 1.0 0.0 0.0 1.0
+            specular 1.0 1.0 1.0 1.0
+        end
+    end
+    node //White Light Front
+        light
+        type 1
+        position 0.0 0.0 -5.0
+        scale 1.0 1.0 1.0
+        rotation 0.0 0.0 0.0
+        ambient 1.0 1.0 1.0 1.0
+        diffuse 1.0 1.0 1.0 1.0
+        specular 1.0 1.0 1.0 1.0
+    end
+    node //Blue Light Outside Left
+        light
+        type 0
+        position -5.0 -5.0 0.0
+        scale 1.0 1.0 1.0
+        rotation 0.0 0.0 0.0
+        ambient 0.0 0.0 1.0 1.0
+        diffuse 0.0 0.0 1.0 1.0
+        specular 1.0 1.0 1.0 1.0
+    end
+    node //Green Light Right Side
+        light
+        type 0
+        position 5.0 0.0 0.0
+        scale 1.0 1.0 1.0
+        rotation 0.0 0.0 0.0
+        ambient 0.0 1.0 0.0 1.0
+        diffuse 0.0 1.0 0.0 1.0
+        specular 1.0 1.0 1.0 1.0
+    end
+    node //Yellow Light Top
+        light
+        type 0
+        position 0.0 0.0 0.0
+        scale 1.0 1.0 1.0
+        rotation 0.0 0.0 0.0
+        ambient 1.0 1.0 0.0 1.0
+        diffuse 1.0 1.0 0.0 1.0
+        specular 1.0 1.0 1.0 1.0
+    end
+end
