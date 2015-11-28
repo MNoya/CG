@@ -17,6 +17,11 @@ scene_node* parse_scene(char* path)
     scene->type = ROOT;
     scene->nChilds = 0;
     scene->ID = NODE_ID;
+    Vec3f origin = {0,0,0};
+    Vec3f scale = {1,1,1};
+    scene->position = origin;
+    scene->rotation = origin;
+    scene->scale = scale;
 
     char line [ 128 ];
     int res = fscanf(file, "%s", line);
@@ -167,27 +172,28 @@ void render_node(scene_node* node, int camera_option, Vec3f translation, Vec3f r
 {
     glPushMatrix();   
 
-    if ( node->type == MODEL )
+    if (camera_option == node->ID)
     {
-        if (camera_option == node->ID)
-        {
-            //printf("Transform %s ID %d depth %d\n",node->name,node->ID,node->depth);
-            glTranslatef(node->position.x + translation.x, 
-                     node->position.y + translation.y,
-                     node->position.z + translation.z);
-            glRotatef(node->rotation.x + rotation.x, 1.0f, 0.0f, 0.0f);
-            glRotatef(node->rotation.y + rotation.y, 0.0f, 1.0f, 0.0f);
-            glRotatef(node->rotation.z + rotation.z, 0.0f, 0.0f, 1.0f);
-            glScalef(node->scale.x+scale,node->scale.y+scale,node->scale.z+scale);
-        }
-        else
-        {
-            glTranslatef(node->position.x, node->position.y, node->position.z);
-            glRotatef(node->rotation.x, 1.0f, 0.0f, 0.0f);
-            glRotatef(node->rotation.y, 0.0f, 1.0f, 0.0f);
-            glRotatef(node->rotation.z, 0.0f, 0.0f, 1.0f);
-            glScalef(node->scale.x,node->scale.y,node->scale.z);
-        }
+        //printf("Transform Node ID %d depth %d\n",node->ID,node->depth);
+        node->position.x = node->position.x + translation.x;
+        node->position.y = node->position.y + translation.y;
+        node->position.z = node->position.z + translation.z;
+        node->rotation.x = node->rotation.x + rotation.x;
+        node->rotation.y = node->rotation.y + rotation.y;
+        node->rotation.z = node->rotation.z + rotation.z;
+        node->scale.x = node->scale.x+scale;
+        node->scale.y = node->scale.y+scale;
+        node->scale.z = node->scale.z+scale;
+    }
+
+    glTranslatef(node->position.x, node->position.y, node->position.z);
+    glRotatef(node->rotation.x, 1.0f, 0.0f, 0.0f);
+    glRotatef(node->rotation.y, 0.0f, 1.0f, 0.0f);
+    glRotatef(node->rotation.z, 0.0f, 0.0f, 1.0f);
+    glScalef(node->scale.x,node->scale.y,node->scale.z);
+
+    if ( node->type == MODEL )
+    {        
         if (use_shader)
         {
             shader_use(shader);
@@ -213,12 +219,10 @@ void render_node(scene_node* node, int camera_option, Vec3f translation, Vec3f r
             float ambient[] = {node->ambient.r,node->ambient.g,node->ambient.b,node->ambient.a};
             float diffuse[] = {node->diffuse.r,node->diffuse.g,node->diffuse.b,node->diffuse.a};
             float specular[] = {node->specular.r,node->specular.g,node->specular.b,node->specular.a};
-            float pos[]= {node->position.x,node->position.y,node->position.z, node->light_type};
             
             glLightfv(lightN, GL_AMBIENT, ambient);
             glLightfv(lightN, GL_DIFFUSE, diffuse);
             glLightfv(lightN, GL_SPECULAR, specular);
-            glLightfv(lightN, GL_POSITION, pos);
 
             glEnable(lightN);
             
@@ -229,7 +233,11 @@ void render_node(scene_node* node, int camera_option, Vec3f translation, Vec3f r
             glMateriali(GL_FRONT, GL_SHININESS, 32);           
 
             node->lightOn = 1;
-        }  
+        }
+
+        // Reposition the light
+        float pos[]= {node->position.x,node->position.y,node->position.z, node->light_type};
+        glLightfv(lightN, GL_POSITION, pos);
     }
 
     int nChilds = node->nChilds;

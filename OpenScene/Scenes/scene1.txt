@@ -10,16 +10,16 @@ node
         position 10.0 -15.0 0.0
         scale 10.0 10.0 10.0
         rotation 10.0 45.0 0.0
-        node
-            light
-            type 0
-            position 0.0 0.0 0.0
-            scale 1.0 1.0 1.0
-            rotation 10.0 0.0 0.0
-            ambient 0.1 0.1 0.1 1.0
-            diffuse 1.0 0.0 0.0 1.0
-            specular 1.0 1.0 1.0 1.0
-        end
+    end
+    node
+        light
+        type 0
+        position 0.0 0.0 0.0
+        scale 1.0 1.0 1.0
+        rotation 0.0 0.0 0.0
+        ambient 0.8 0.8 0.8 1.0
+        diffuse 0.2 0.2 0.2 1.0
+        specular 1.0 1.0 1.0 1.0
     end
 end
 
@@ -35,16 +35,16 @@ node
         position 10.0 -15.0 0.0
         scale 10.0 10.0 10.0
         rotation 10.0 45.0 0.0
-        node
-            light
-            type 0
-            position 0.0 0.0 0.0
-            scale 1.0 1.0 1.0
-            rotation 10.0 0.0 0.0
-            ambient 0.1 0.1 0.1 1.0
-            diffuse 1.0 0.0 0.0 1.0
-            specular 1.0 1.0 1.0 1.0
-        end
+    end
+    node
+        light
+        type 0
+        position 0.0 0.0 0.0
+        scale 1.0 1.0 1.0
+        rotation 00.0 0.0 0.0
+        ambient 0.8 0.0 0.0 1.0
+        diffuse 0.2 1.0 1.0 1.0
+        specular 1.0 1.0 1.0 1.0
     end
 end
 
@@ -55,14 +55,20 @@ node
     scale 0.5 0.5 0.5
     rotation -90.0 0.0 -45.0
     node
-        childs 0
+        model Models/box_texturas.obj
+        texture Models/box.jpg
+        position 10.0 -15.0 0.0
+        scale 10.0 10.0 10.0
+        rotation 10.0 45.0 0.0
+    end
+    node
         light
-        type 1
+        type 0
         position 0.0 0.0 0.0
         scale 1.0 1.0 1.0
         rotation 0.0 0.0 0.0
-        ambient 1.0 0.1 0.1 1.0
-        diffuse 0.0 1.0 0.0 1.0
-        specular 0.0 1.0 1.0 1.0
+        ambient 0.8 0.8 0.8 1.0
+        diffuse 0.2 0.2 0.2 1.0
+        specular 1.0 1.0 1.0 1.0
     end
 end

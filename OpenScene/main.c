@@ -26,7 +26,6 @@ float ang_vel = 0.1f;
 float posX = 0;
 float posY = 0;
 float posZ = 0;
-int currentObject = 1;
 
 int main(int argc, char* argv[])
 {
@@ -164,28 +163,11 @@ int main(int argc, char* argv[])
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
         glEnable(GL_TEXTURE_2D);
 
-        Vec3f translation = {0, 0, 0};
-        Vec3f rotation = {0, 0, 0};
+        Vec3f translation = {posX, posY, posZ};
+        Vec3f rotation = {pitch, yaw, roll};
+        render_node(Scene, camera_option, translation, rotation, scale, use_shader, specular, gouraud, uniform_especular, uniform_tex);
 
-        // Translate/Rotate/Scale the whole screen
-        if (camera_option == 0)
-        {
-            glPushMatrix();
-                glTranslatef(posX, posY, posZ);
-                glRotatef(pitch, 1.0f, 0.0f, 0.0f);
-                glRotatef(yaw, 0.0f, 1.0f, 0.0f);
-                glRotatef(roll, 0.0f, 0.0f, 1.0f);
-                glScalef(1+scale, 1+scale, 1+scale);
-                render_node(Scene, camera_option, translation, rotation, scale, use_shader, specular, gouraud, uniform_especular, uniform_tex);
-            glPopMatrix();
-        }
-        else
-        {
-            translation.x = posX; translation.y = posY; translation.z = posZ;
-            rotation.x = pitch; rotation.y = yaw; rotation.z = roll;
-            render_node(Scene, camera_option, translation, rotation, scale, use_shader, specular, gouraud, uniform_especular, uniform_tex);
-        }
-
+        resetValues();
         cg_repaint();
     }
 
@@ -220,4 +202,16 @@ void toggleBackfaceCulling(char bEnabled)
 void toggleLights(char bEnabled)
 {
     bEnabled ? glEnable(GL_LIGHTING) : glDisable(GL_LIGHTING);
+}
+
+void resetValues()
+{
+    pitch = 0.0f;
+    yaw = 0.0f;
+    roll = 0.0f;
+    scale = 0.0f;
+    ang_vel = 0.1f;
+    posX = 0;
+    posY = 0;
+    posZ = 0;
 }
