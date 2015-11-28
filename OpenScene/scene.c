@@ -1,6 +1,7 @@
 #include "scene.h"
 
 int LIGHT_COUNT = 0;
+int NODE_ID = 0;
 
 scene_node* parse_scene(char* path)
 {
@@ -15,6 +16,7 @@ scene_node* parse_scene(char* path)
     scene_node* scene = (scene_node*) cg_malloc(sizeof(scene_node));
     scene->type = ROOT;
     scene->nChilds = 0;
+    scene->ID = NODE_ID;
 
     char line [ 128 ];
     int res = fscanf(file, "%s", line);
@@ -22,11 +24,8 @@ scene_node* parse_scene(char* path)
     {
         if (strcmp(line,"node")==0)
         {
-            printf("PARSING NODE [%d]\n",scene->nChilds);
             scene_node* node = parse_node(file, line, depth);
-            printf("PARSED NODE AT %p ",node);
             scene->childs[scene->nChilds] = node;
-            printf("SCENE.CHILDS[%d] = %p\n",scene->nChilds);
             scene->nChilds++;
         }
         else if (strcmp(line,"end")==0)
@@ -49,15 +48,19 @@ scene_node* parse_scene(char* path)
 scene_node* parse_node(FILE* file, char* line, int depth)
 {
     depth++;
-    printf("-- NODE DEPTH %d --\n", depth);
+    NODE_ID++;
+    printf("-- NODE ID %d -- DEPTH %d --\n", NODE_ID, depth);
     fscanf(file, "%s", line);
 
     scene_node* n = (scene_node*) cg_malloc(sizeof(scene_node));
+    n->depth = depth;
+    n->ID = NODE_ID;
+    n->depth = depth;
 
     int currentChild = 0;
     while(strcmp(line,"end")!=0)
     {
-        printf("Line: %s\n",line);
+        //printf("Line: %s\n",line);
         if (strcmp(line,"model")==0)
         {   
             n->type = MODEL;
@@ -99,7 +102,7 @@ scene_node* parse_node(FILE* file, char* line, int depth)
             n->lightOn = 0;
             LIGHT_COUNT++;
 
-            printf("-- LIGHT\n");
+            printf("-- LIGHT ");
 
             float light_type;
             fscanf(file, "%s\n", line);
@@ -159,23 +162,32 @@ scene_node* parse_node(FILE* file, char* line, int depth)
     return n;
 }
 
-void render_node(scene_node* node, int level, Vec3f translation, Vec3f rotation, float scale,
+void render_node(scene_node* node, int camera_option, Vec3f translation, Vec3f rotation, float scale,
                 int use_shader, int specular, Shader shader, GLuint uniform_especular, GLuint uniform_tex)
 {
-    glPushMatrix();
+    glPushMatrix();   
 
     if ( node->type == MODEL )
     {
-        //printf("Rendering %s\n",node->name);
-
-        glTranslatef(node->position.x + translation.x, 
+        if (camera_option == node->ID)
+        {
+            //printf("Transform %s ID %d depth %d\n",node->name,node->ID,node->depth);
+            glTranslatef(node->position.x + translation.x, 
                      node->position.y + translation.y,
                      node->position.z + translation.z);
-        glRotatef(node->rotation.x + rotation.x, 1.0f, 0.0f, 0.0f);
-        glRotatef(node->rotation.y + rotation.y, 0.0f, 1.0f, 0.0f);
-        glRotatef(node->rotation.z + rotation.z, 0.0f, 0.0f, 1.0f);
-        glScalef(node->scale.x+scale,node->scale.y+scale,node->scale.z+scale);  
-
+            glRotatef(node->rotation.x + rotation.x, 1.0f, 0.0f, 0.0f);
+            glRotatef(node->rotation.y + rotation.y, 0.0f, 1.0f, 0.0f);
+            glRotatef(node->rotation.z + rotation.z, 0.0f, 0.0f, 1.0f);
+            glScalef(node->scale.x+scale,node->scale.y+scale,node->scale.z+scale);
+        }
+        else
+        {
+            glTranslatef(node->position.x, node->position.y, node->position.z);
+            glRotatef(node->rotation.x, 1.0f, 0.0f, 0.0f);
+            glRotatef(node->rotation.y, 0.0f, 1.0f, 0.0f);
+            glRotatef(node->rotation.z, 0.0f, 0.0f, 1.0f);
+            glScalef(node->scale.x,node->scale.y,node->scale.z);
+        }
         if (use_shader)
         {
             shader_use(shader);
@@ -217,7 +229,7 @@ void render_node(scene_node* node, int level, Vec3f translation, Vec3f rotation,
             glMateriali(GL_FRONT, GL_SHININESS, 32);           
 
             node->lightOn = 1;
-        }     
+        }  
     }
 
     int nChilds = node->nChilds;
@@ -225,7 +237,7 @@ void render_node(scene_node* node, int level, Vec3f translation, Vec3f rotation,
     {
         for (int i = 0; i < nChilds; ++i)
         {
-            render_node( node->childs[i], level+1, translation, rotation, scale, 
+            render_node( node->childs[i], camera_option, translation, rotation, scale, 
                         use_shader, specular, shader, uniform_especular, uniform_tex );
         }
     }

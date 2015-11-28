@@ -12,8 +12,10 @@
 #include "shader.h"
 #include "scene.h"
 
-void enableCullFace();
-void setCurrentObject(int i);
+void toggleZBuff(char bEnabled);
+void toggleWireframe(char bEnabled);
+void toggleBackfaceCulling(char bEnabled);
+void toggleLights(char bEnabled);
 
 // Scene values
 float pitch = 0.0f;
@@ -82,6 +84,14 @@ int main(int argc, char* argv[])
 
     printf("Done, drawing...\n");   
 
+    /* Camera Options
+     0: Root
+     1: First child
+     2: Second child
+     3: First subchild
+    */
+    int camera_option = 0;
+
     while (!done)
     {
         /* Process Keypresses
@@ -99,17 +109,23 @@ int main(int argc, char* argv[])
             {
                 case SDL_KEYDOWN:
                     key_pressed[event.key.keysym.sym] = 1;
-                    if (event.key.keysym.sym == SDLK_p) { use_shader = !use_shader; break; }
-                    else if (event.key.keysym.sym == SDLK_l) { specular = !specular; break; }
-                    else if (event.key.keysym.sym == SDLK_z) { zbuff = !zbuff; zbuff ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST); break; }
-                    else if (event.key.keysym.sym == SDLK_m) { wireframe = !wireframe; wireframe ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break; }
-                    else if (event.key.keysym.sym == SDLK_b) { bfc = !bfc; bfc ? enableCullFace() : glDisable(GL_CULL_FACE); break; }
-                    else if (event.key.keysym.sym == SDLK_t) { light = !light; light? glEnable(GL_LIGHTING) : glDisable(GL_LIGHTING); break; }
-                    else if (event.key.keysym.sym == SDLK_1) { printf("1\n"); break; }
-                    else if (event.key.keysym.sym == SDLK_2) { printf("2\n"); break; }
-                    else if (event.key.keysym.sym == SDLK_3) { printf("3\n"); break; }
-                    else if (event.key.keysym.sym == SDLK_4) { printf("4\n"); break; }
-                    else if (event.key.keysym.sym == SDLK_5) { printf("5\n"); break; }
+                    int key = event.key.keysym.sym;
+                    if (key==SDLK_p)      { use_shader = !use_shader; printf("Using Shader: %d\n",use_shader); break; }
+                    else if (key==SDLK_l) { specular = !specular; printf("Specular: %d\n",specular); break; }
+                    else if (key==SDLK_z) { zbuff = !zbuff; printf("Z-Buffer: %d\n",zbuff); toggleZBuff(zbuff); break; }
+                    else if (key==SDLK_m) { wireframe = !wireframe; printf("Wireframe: %d\n", wireframe); toggleWireframe(wireframe); break; }
+                    else if (key==SDLK_b) { bfc = !bfc; printf("Backface Culling: %d\n",bfc); toggleBackfaceCulling(bfc); break; }
+                    else if (key==SDLK_t) { light = !light; printf("Lights: %d\n",light); toggleLights(light); break; }
+                    else if (key==SDLK_0) { camera_option = 0; printf("Camera at Node 0 - Root\n"); break; }
+                    else if (key==SDLK_1) { camera_option = 1; printf("Camera at Node 1\n"); break; }
+                    else if (key==SDLK_2) { camera_option = 2; printf("Camera at Node 2\n"); break; }
+                    else if (key==SDLK_3) { camera_option = 3; printf("Camera at Node 3\n"); break; }
+                    else if (key==SDLK_4) { camera_option = 4; printf("Camera at Node 4\n"); break; }
+                    else if (key==SDLK_5) { camera_option = 5; printf("Camera at Node 5\n"); break; }
+                    else if (key==SDLK_6) { camera_option = 6; printf("Camera at Node 6\n"); break; }
+                    else if (key==SDLK_7) { camera_option = 7; printf("Camera at Node 7\n"); break; }
+                    else if (key==SDLK_8) { camera_option = 8; printf("Camera at Node 8\n"); break; }
+                    else if (key==SDLK_9) { camera_option = 9; printf("Camera at Node 9\n"); break; }
                     else if (event.key.keysym.sym != SDLK_ESCAPE) break;
 
                 case SDL_QUIT : done = 1; break;
@@ -148,19 +164,27 @@ int main(int argc, char* argv[])
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
         glEnable(GL_TEXTURE_2D);
 
-        glPushMatrix();
-        glTranslatef(posX, posY, posZ);
-        glRotatef(pitch, 1.0f, 0.0f, 0.0f);
-        glRotatef(yaw, 0.0f, 1.0f, 0.0f);
-        glRotatef(roll, 0.0f, 0.0f, 1.0f);
+        Vec3f translation = {0, 0, 0};
+        Vec3f rotation = {0, 0, 0};
 
-        Vec3f translation = {posX, posY, posZ};
-        Vec3f rotation = {pitch, yaw, roll};
-        int level = 0;
-
-        render_node(Scene, level, translation, rotation, scale, use_shader, specular, gouraud, uniform_especular, uniform_tex);
-
-        glPopMatrix();
+        // Translate/Rotate/Scale the whole screen
+        if (camera_option == 0)
+        {
+            glPushMatrix();
+                glTranslatef(posX, posY, posZ);
+                glRotatef(pitch, 1.0f, 0.0f, 0.0f);
+                glRotatef(yaw, 0.0f, 1.0f, 0.0f);
+                glRotatef(roll, 0.0f, 0.0f, 1.0f);
+                glScalef(1+scale, 1+scale, 1+scale);
+                render_node(Scene, camera_option, translation, rotation, scale, use_shader, specular, gouraud, uniform_especular, uniform_tex);
+            glPopMatrix();
+        }
+        else
+        {
+            translation.x = posX; translation.y = posY; translation.z = posZ;
+            rotation.x = pitch; rotation.y = yaw; rotation.z = roll;
+            render_node(Scene, camera_option, translation, rotation, scale, use_shader, specular, gouraud, uniform_especular, uniform_tex);
+        }
 
         cg_repaint();
     }
@@ -176,9 +200,24 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-void enableCullFace()
+void toggleZBuff(char bEnabled)
 {
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glFrontFace(GL_CW);
+    bEnabled ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
+}
+
+void toggleWireframe(char bEnabled)
+{
+    bEnabled ? glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) : glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
+void toggleBackfaceCulling(char bEnabled)
+{
+    if (bEnabled) { glEnable(GL_CULL_FACE); glCullFace(GL_BACK); glFrontFace(GL_CW); }
+    else { glDisable(GL_CULL_FACE); }
+
+}
+
+void toggleLights(char bEnabled)
+{
+    bEnabled ? glEnable(GL_LIGHTING) : glDisable(GL_LIGHTING);
 }

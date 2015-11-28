@@ -45,6 +45,10 @@ typedef struct node
     RGBA diffuse;
     RGBA specular;
 
+    //For camera options
+    int ID;
+    int depth;
+
     int nChilds;
     struct node *childs[10];
 } scene_node; //'struct node'
