@@ -2,7 +2,6 @@
 
 Obj* obj_load(char* path)
 {
-    const char space[2] = " ";
     ObjData* contVec = CountLines(path);
     int nVertices = contVec->nVertices;
     int nCaras = contVec->nCaras;
@@ -52,7 +51,7 @@ Obj* obj_load(char* path)
             int normal1, normal2, normal3;
             int text1, text2, text3;
 
-            int matches = fscanf(file, "%c %d/%d/%d %d/%d/%d %d/%d/%d\n", &c, &vertice1, &normal1, &text1, &vertice2, &normal2, &text2, &vertice3, &normal3, &text3);
+            fscanf(file, "%c %d/%d/%d %d/%d/%d %d/%d/%d\n", &c, &vertice1, &normal1, &text1, &vertice2, &normal2, &text2, &vertice3, &normal3, &text3);
             
             //printf("%d/%d/%d %d/%d/%d %d/%d/%d\n", vertice1, normal1, text1, vertice2, normal2, text2, vertice3, normal3, text3);
 
@@ -129,9 +128,6 @@ void obj_render(Obj* o)
 void obj_free(Obj* o)
 {
     //printf("Freeing Object\n");
-    int nVertices = o->nVertices;
-    int nCaras = o->nCaras;
-    int nNormales = o->nNormales;
 
     // Free struct
     //printf("Free listaVertices: %p\n",o->listaVertices);
