@@ -1,4 +1,6 @@
-README
+Integrantes
+    Mariano Abadie
+    Martin Noya
 
 # Implementado
 * Todo lo obligatorio

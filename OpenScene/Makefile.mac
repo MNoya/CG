@@ -1,47 +1,50 @@
-# Edite los siguientes valores para configurar acorde a su ambiente de desarrollo:
+# Edite los siguientes valores para configurar
+# acorde a su ambiente de desarrollo:
 
 # ubicacion del directorio "include" del ambiente:
-INCLUDES=-I..\mingw\include
+INCLUDES=`sdl-config --cflags`
 
 # ubicacion del directorio "lib" del ambiente:
-LIB_DIRS=-L..\mingw\lib
+LIB_DIRS=`sdl-config --libs`
 
 # agregue aqui, separado con espacios, cada archivo .c que produzca.
 # renombre la extension .c a .o (ejemplo.c -> ejemplo.o):
 OBJECTS = framework/color.o framework/mm.o framework/canvas.o glew.o obj.o texture.o shader.o scene.o main.o
 
 # nombre a asignar al ejecutable producido:
-EXE = cg.exe
+EXE = cg
 
 # No edite por debajo de esta linea
 
 CC = gcc
 
-CFLAGS = -Wall -std=c99 -ggdb -DWIN32 -DGLEW_STATIC
-LD_FLAGS = -lmingw32 -lSDLmain -lSDL -luser32 -lopengl32 -lSDL_image
-SHELL=C:/Windows/System32/cmd.exe
+CFLAGS = -Wall -ggdb -O0 -DAPPLEMAC -std=c99 -DGL_GLEXT_PROTOTYPES
+LD_FLAGS = 
+#LD_FLAGS = -lSDLmain -lSDL
+
+CPPCHECK = cppcheck --enable=all --error-exitcode=255 -f
 
 all: $(EXE)
 
-main.o: main.c Makefile.win32
-	@echo "Building $@..."
+main.o: main.c Makefile.mac
+	@echo "\nBuilding $@..."
+	@$(CPPCHECK) $<
 	@$(CC) -c $< $(INCLUDES) $(CFLAGS) -o $@
 
-%.o: %.c %.h Makefile.win32
-	@echo "Building $@..."s
+%.o: %.c %.h Makefile.mac
+	@echo "\nBuilding $@..."
+	@$(CPPCHECK) $<
 	@$(CC) -c $< $(INCLUDES) $(CFLAGS) -o $@
 
 
 $(EXE): $(OBJECTS)
-	@echo "Linking..."
+	@echo "\nLinking..."
 	@$(CC) $(OBJECTS) $(INCLUDES) $(CFLAGS) $(LIB_DIRS) $(LD_FLAGS) -o $(EXE)
 	@echo "Generated $(EXE)"
 
 clean:
 	@echo "Cleaning up..."
-	@del $(OBJECTS)
-	@del $(EXE)
+	@rm -f $(OBJECTS) $(EXE)
 
-run: $(EXE)
-	.\$(EXE)
-
+run: all
+	./$(EXE)
