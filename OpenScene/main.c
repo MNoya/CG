@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
         /* Process Keypresses
             p: shader
             L: specular
-            n: z-buffer
+            z: z-buffer
             m: wireframe
             b: b-culling
             t: lights

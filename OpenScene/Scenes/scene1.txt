@@ -1,11 +1,11 @@
 node
     model Models/knight_texturas.obj
     texture Models/knight.png
-    position 20.0 0.0 -60.0
+    position 20.0 0.0 -50.0
     scale 0.5 0.5 0.5
     rotation -90.0 0.0 -90.0
-    diffuse 0.2 0.2 0.2 1.0
-    specular 1.0 1.0 1.0 1.0
+    diffuse 0.8 0.2 0.2 1.0
+    specular 0.2 0.8 0.8 1.0
     shininess 32
     node
         model Models/box_texturas.obj
@@ -13,8 +13,8 @@ node
         position 10.0 -15.0 0.0
         scale 10.0 10.0 10.0
         rotation 10.0 45.0 0.0
-        diffuse 0.2 0.2 0.2 1.0
-        specular 1.0 1.0 1.0 1.0
+        diffuse 0.8 0.2 0.2 1.0
+        specular 0.2 0.8 0.8 1.0
         shininess 32
     end
     node
@@ -23,8 +23,8 @@ node
         position 0.0 0.0 0.0
         scale 1.0 1.0 1.0
         rotation 0.0 0.0 0.0
-        ambient 0.8 0.8 0.8 1.0
-        diffuse 0.2 0.2 0.2 1.0
+        ambient 1.0 1.0 1.0 1.0
+        diffuse 1.0 1.0 1.0 1.0
         specular 1.0 1.0 1.0 1.0
     end
 end
@@ -32,10 +32,10 @@ end
 node
     model Models/knight_texturas.obj
     texture Models/knight_good.png
-    position 0.0 0.0 -50.0
+    position 0.0 0.0 -40.0
     scale 0.5 0.5 0.5
     rotation -90.0 0.0 -90.0
-    diffuse 0.2 0.2 0.2 1.0
+    diffuse 1.0 1.0 1.0 1.0
     specular 1.0 1.0 1.0 1.0
     shininess 32
     node
@@ -44,18 +44,18 @@ node
         position 10.0 -15.0 0.0
         scale 10.0 10.0 10.0
         rotation 10.0 45.0 0.0
-        diffuse 0.2 0.2 0.2 1.0
+        diffuse 1.0 1.0 1.0 1.0
         specular 1.0 1.0 1.0 1.0
         shininess 32
     end
     node
         light
-        type 0
+        type 1
         position 0.0 0.0 0.0
         scale 1.0 1.0 1.0
-        rotation 00.0 0.0 0.0
-        ambient 0.8 0.0 0.0 1.0
-        diffuse 0.2 1.0 1.0 1.0
+        rotation 0.0 0.0 0.0
+        ambient 0.0 1.0 0.0 1.0
+        diffuse 1.0 1.0 1.0 1.0
         specular 1.0 1.0 1.0 1.0
     end
 end
@@ -66,8 +66,8 @@ node
     position -20.0 0.0 -50.0
     scale 0.5 0.5 0.5
     rotation -90.0 0.0 -45.0
-    diffuse 0.2 0.2 0.2 1.0
-    specular 1.0 1.0 1.0 1.0
+    diffuse 0.2 0.8 0.8 1.0
+    specular 0.8 0.2 0.2 1.0
     shininess 32
     node
         model Models/box_texturas.obj
@@ -75,18 +75,18 @@ node
         position 10.0 -15.0 0.0
         scale 10.0 10.0 10.0
         rotation 10.0 45.0 0.0
-        diffuse 0.2 0.2 0.2 1.0
-        specular 1.0 1.0 1.0 1.0
+        diffuse 0.2 0.8 0.8 1.0
+        specular 0.8 0.2 0.2 1.0
         shininess 32
     end
     node
         light
-        type 0
+        type 1
         position 0.0 0.0 0.0
         scale 1.0 1.0 1.0
         rotation 0.0 0.0 0.0
-        ambient 0.8 0.8 0.8 1.0
-        diffuse 0.2 0.2 0.2 1.0
+        diffuse 1.0 1.0 1.0 1.0
+        specular 1.0 1.0 1.0 1.0
         specular 1.0 1.0 1.0 1.0
     end
 end
