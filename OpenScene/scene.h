@@ -56,8 +56,9 @@ typedef struct node
 
 scene_node* parse_scene(char* path);
 scene_node* parse_node(FILE* file, char* line, int depth);
-void render_node(scene_node* n, int level, Vec3f translation, Vec3f rotation, float scale, 
+void render_node(scene_node* n, int camera_node, Vec3f translation, Vec3f rotation, float scale, 
                 int use_shader, int specular, Shader shader, GLuint uniform_especular, GLuint uniform_tex);
 void scene_free(scene_node* n);
+scene_node* get_node(int ID, scene_node* node);
 
 #endif //SCENE_H

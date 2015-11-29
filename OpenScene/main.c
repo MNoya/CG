@@ -16,6 +16,7 @@ void toggleZBuff(char bEnabled);
 void toggleWireframe(char bEnabled);
 void toggleBackfaceCulling(char bEnabled);
 void toggleLights(char bEnabled);
+void tryCamera(int nodeID, scene_node* s);
 void resetValues();
 
 // Scene values
@@ -79,7 +80,7 @@ int main(int argc, char* argv[])
     GLint uniform_tex = shader_get_unif_loc(gouraud, "tex");
 
     // Scene chooser
-    printf("Choose a scene\n");
+    printf("Choose a scene: ");
     int scene_chosen = 0;
     char* scene_path;
     scene_node* Background = parse_scene("Scenes/background.txt");
@@ -121,21 +122,17 @@ int main(int argc, char* argv[])
     {
         case 1: scene_path = "Scenes/scene1.txt"; break;
         case 2: scene_path = "Scenes/scene2.txt"; break;
-        case 3: scene_path = "Scenes/background.txt"; break;
+        //case 3: scene_path = "Scenes/background.txt"; break;
     }
+    printf("%d\n",scene_chosen);
 
     printf("Loading scene graph\n");
     scene_node* Scene = parse_scene(scene_path);
 
     printf("Done, drawing...\n");   
 
-    /* Camera Options
-     0: Root
-     1: First child
-     2: Second child
-     3: First subchild
-    */
-    int camera_option = 0;
+    // Camera Options: 1-9 nodes, 0 for scene root
+    int camera_node = 0;
 
     while (!done)
     {
@@ -161,16 +158,16 @@ int main(int argc, char* argv[])
                     else if (key==SDLK_m) { wireframe = !wireframe; printf("Wireframe: %d\n", wireframe); toggleWireframe(wireframe); break; }
                     else if (key==SDLK_b) { bfc = !bfc; printf("Backface Culling: %d\n",bfc); toggleBackfaceCulling(bfc); break; }
                     else if (key==SDLK_t) { light = !light; printf("Lights: %d\n",light); toggleLights(light); break; }
-                    else if (key==SDLK_0) { camera_option = 0; printf("Camera at Node 0 - Root\n"); break; }
-                    else if (key==SDLK_1) { camera_option = 1; printf("Camera at Node 1\n"); break; }
-                    else if (key==SDLK_2) { camera_option = 2; printf("Camera at Node 2\n"); break; }
-                    else if (key==SDLK_3) { camera_option = 3; printf("Camera at Node 3\n"); break; }
-                    else if (key==SDLK_4) { camera_option = 4; printf("Camera at Node 4\n"); break; }
-                    else if (key==SDLK_5) { camera_option = 5; printf("Camera at Node 5\n"); break; }
-                    else if (key==SDLK_6) { camera_option = 6; printf("Camera at Node 6\n"); break; }
-                    else if (key==SDLK_7) { camera_option = 7; printf("Camera at Node 7\n"); break; }
-                    else if (key==SDLK_8) { camera_option = 8; printf("Camera at Node 8\n"); break; }
-                    else if (key==SDLK_9) { camera_option = 9; printf("Camera at Node 9\n"); break; }
+                    else if (key==SDLK_0) { camera_node = 0; tryCamera(camera_node, Scene); break; }
+                    else if (key==SDLK_1) { camera_node = 1; tryCamera(camera_node, Scene); break; }
+                    else if (key==SDLK_2) { camera_node = 2; tryCamera(camera_node, Scene); break; }
+                    else if (key==SDLK_3) { camera_node = 3; tryCamera(camera_node, Scene); break; }
+                    else if (key==SDLK_4) { camera_node = 4; tryCamera(camera_node, Scene); break; }
+                    else if (key==SDLK_5) { camera_node = 5; tryCamera(camera_node, Scene); break; }
+                    else if (key==SDLK_6) { camera_node = 6; tryCamera(camera_node, Scene); break; }
+                    else if (key==SDLK_7) { camera_node = 7; tryCamera(camera_node, Scene); break; }
+                    else if (key==SDLK_8) { camera_node = 8; tryCamera(camera_node, Scene); break; }
+                    else if (key==SDLK_9) { camera_node = 9; tryCamera(camera_node, Scene); break; }
                     else if (key != SDLK_ESCAPE) break;
 
                 case SDL_QUIT : done = 1; break;
@@ -211,12 +208,21 @@ int main(int argc, char* argv[])
 
         Vec3f translation = {posX, posY, posZ};
         Vec3f rotation = {pitch, yaw, roll};
-        render_node(Scene, camera_option, translation, rotation, scale, use_shader, specular, gouraud, uniform_especular, uniform_tex);
+        render_node(Scene, camera_node, translation, rotation, scale, use_shader, specular, gouraud, uniform_especular, uniform_tex);
 
-        if (camera_option == 0)
+        // Print node values modified
+        scene_node* node = get_node(camera_node, Scene);
+        if (node != NULL)
         {
-            if (scale != 0) printf("Scene scale: %f\n",Scene->scale.x);
-            if (translation.x != 0) printf("Scene X %f\n",Scene->position.x);
+            if (translation.x != 0) printf("Node %d X %f\n",camera_node, node->position.x);
+            if (translation.y != 0) printf("Node %d Y %f\n",camera_node, node->position.y);
+            if (translation.z != 0) printf("Node %d Z %f\n",camera_node, node->position.z);
+
+            if (rotation.x != 0) printf("Node %d Pitch %f\n",camera_node, node->rotation.x);
+            if (rotation.y != 0) printf("Node %d Yaw %f\n",camera_node, node->rotation.y);
+            if (rotation.z != 0) printf("Node %d Roll %f\n",camera_node, node->rotation.z);
+
+            if (scale != 0) printf("Node %d scale: %f\n",camera_node, node->scale.x);
         }
 
         resetValues();
@@ -254,6 +260,21 @@ void toggleBackfaceCulling(char bEnabled)
 void toggleLights(char bEnabled)
 {
     bEnabled ? glEnable(GL_LIGHTING) : glDisable(GL_LIGHTING);
+}
+
+void tryCamera(int nodeID, scene_node* s)
+{
+    scene_node* node = get_node(nodeID, s);
+    if (node != NULL)
+    {
+        if (node->type == MODEL) printf("Camera at Node %d, %s \n",nodeID,node->name);
+        else if (node->type == LIGHT) printf("Camera at Node %d, Light Number %d \n",nodeID,node->nLight);
+        else if (node->type == ROOT) printf("Camera at Scene Root\n");
+    }
+    else
+    {
+        printf("The scene doesn't have a Node %d\n",nodeID);
+    }
 }
 
 void resetValues()
