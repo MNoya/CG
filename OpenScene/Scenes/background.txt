@@ -1,0 +1,21 @@
+node
+    model Models/background.obj
+    texture Models/background.png
+    position 0.0 0.0 -0.5
+    scale 1 1 1
+    rotation 0.0 0.0 0.0
+    diffuse 1.0 1.0 1.0 1.0
+    specular 1.0 1.0 1.0 1.0
+    shininess 64
+end
+
+node
+    light
+    type 1
+    position 0.0 0.0 0.0
+    scale 1.0 1.0 1.0
+    rotation 0.0 0.0 0.0
+    ambient 1.0 1.0 1.0 1.0
+    diffuse 1.0 1.0 1.0 1.0
+    specular 1.0 1.0 1.0 1.0
+end

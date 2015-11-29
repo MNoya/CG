@@ -302,5 +302,6 @@ void scene_free(scene_node* node)
         printf("   There was a light at this node, nothing to free here\n");
 
     cg_free(node);
+    NODE_ID = 0;
     printf("Finished scene_free call\n");
 }

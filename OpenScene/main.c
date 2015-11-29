@@ -70,9 +70,19 @@ int main(int argc, char* argv[])
     glEnable(GL_LIGHTING); // Lights on by default
     char light = 1;
 
-        // Scene chooser
+    unsigned char key_pressed[1024];
+    memset(key_pressed, 0, 1024);
+
+    printf("Loading shaders\n");
+    Shader gouraud = shader_new("shaders/gouraud_vp.glsl", "shaders/gouraud_fp.glsl");
+    GLint uniform_especular = shader_get_unif_loc(gouraud, "especular");
+    GLint uniform_tex = shader_get_unif_loc(gouraud, "tex");
+
+    // Scene chooser
+    printf("Choose a scene\n");
     int scene_chosen = 0;
     char* scene_path;
+    scene_node* Background = parse_scene("Scenes/background.txt");
     while (!scene_chosen)
     {
         SDL_Event event_choice;
@@ -81,24 +91,41 @@ int main(int argc, char* argv[])
             switch (event_choice.type)
             {
                 case SDL_KEYDOWN:
-                    if (event_choice.key.keysym.sym == SDLK_1) {scene_chosen=1; scene_path = "Scenes/scene1.txt"; break; }
-                    if (event_choice.key.keysym.sym == SDLK_2) {scene_chosen=1; scene_path = "Scenes/scene2.txt"; break; }
+                    key_pressed[event_choice.key.keysym.sym] = 1;
+                    int key = event_choice.key.keysym.sym;
+                    if (key == SDLK_1) {scene_chosen=1; break; }
+                    else if (key == SDLK_2) {scene_chosen=2; break; }
+                    else if (key == SDLK_3) {scene_chosen=3; break; }
+                    else if (key != SDLK_ESCAPE) break;
+                case SDL_QUIT : scene_chosen = 1; done = 1; break;
+                case SDL_KEYUP: key_pressed[event_choice.key.keysym.sym] = 0;
             }
         }
+
+        // Draw background scene
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
+        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_TEXTURE_2D);
+
+        Vec3f translation = {0, 0, 0}; Vec3f rotation = {0, 0, 0};
+        render_node(Background, 0, translation, rotation, scale, use_shader, specular, gouraud, uniform_especular, uniform_tex);
+        
+        cg_repaint();
     }
     //----------------------------------------------//
+    scene_free(Background);
 
-    unsigned char key_pressed[1024];
-    memset(key_pressed, 0, 1024);
+    switch(scene_chosen)
+    {
+        case 1: scene_path = "Scenes/scene1.txt"; break;
+        case 2: scene_path = "Scenes/scene2.txt"; break;
+        case 3: scene_path = "Scenes/background.txt"; break;
+    }
 
     printf("Loading scene graph\n");
     scene_node* Scene = parse_scene(scene_path);
-
-    printf("Loading shaders\n");
-    Shader gouraud = shader_new("shaders/gouraud_vp.glsl", "shaders/gouraud_fp.glsl");
-
-    GLint uniform_especular = shader_get_unif_loc(gouraud, "especular");
-    GLint uniform_tex = shader_get_unif_loc(gouraud, "tex");
 
     printf("Done, drawing...\n");   
 
@@ -144,7 +171,7 @@ int main(int argc, char* argv[])
                     else if (key==SDLK_7) { camera_option = 7; printf("Camera at Node 7\n"); break; }
                     else if (key==SDLK_8) { camera_option = 8; printf("Camera at Node 8\n"); break; }
                     else if (key==SDLK_9) { camera_option = 9; printf("Camera at Node 9\n"); break; }
-                    else if (event.key.keysym.sym != SDLK_ESCAPE) break;
+                    else if (key != SDLK_ESCAPE) break;
 
                 case SDL_QUIT : done = 1; break;
                 case SDL_KEYUP: key_pressed[event.key.keysym.sym] = 0;
